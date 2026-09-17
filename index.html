@@ -2,1033 +2,2120 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#060a0e">
-<title>KickOff Live — Free Sports Streaming</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gala · Store Expiry Dashboard</title>
+<link rel="icon" href="https://i.ibb.co/rfGVJp3F/Gala-EXP-2-removebg-preview-2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/styles/ag-grid.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/styles/ag-theme-quartz.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/dist/ag-grid-community.min.js"></script>
 <style>
-/* ══════════════════════════════════════
-   DESIGN: Stadium-dark industrial
-   Primary: Electric green #00ff87
-   Accent: Signal orange #ff4d00
-   BG: Near-black pitch dark
-══════════════════════════════════════ */
-:root{
-  --bg:#060a0e;--bg2:#0a0f15;--bg3:#0f1820;--bg4:#162030;
-  --grn:#00ff87;--grn2:#00cc6a;--org:#ff4d00;--org2:#ff7340;
-  --gold:#ffc107;--text:#e8f0f8;--sub:#6b8299;
-  --card:#0c141c;--brd:#1a2a3a;--red:#ff3b5c;
-  --rad:10px;--t:all .2s cubic-bezier(.4,0,.2,1);
+:root {
+  --bg:            #f8fafd;
+  --bg-tint:       #ffffff;
+  --surface:       rgba(255,255,255,0.95);
+  --surface-solid: #ffffff;
+  --surface3:      #f1f4f9;
+  --border:        rgba(28,25,23,0.08);
+  --border-strong: rgba(28,25,23,0.14);
+
+  --text:          #1c1917;
+  --t2:            #57534e;
+  --t3:            #a8a29e;
+
+  --accent:        #222d65;
+  --accent2:       #1a2350;
+  --accent-soft:   #32408a;
+  --accent-glow:   rgba(34,45,101,0.12);
+  --accent-grad:   linear-gradient(135deg, #2c3a7f 0%, #222d65 55%, #1a2350 100%);
+
+  --amber:         #4a5a9e;
+  --amber-l:       #ebedf5;
+  --amber-b:       #c5cbdf;
+
+  --red:           #dc2626;
+  --red-l:         #fef2f2;
+  --red-b:         #fecaca;
+  --orange:        #ea580c;
+  --orange-l:      #fff7ed;
+  --orange-b:      #fed7aa;
+  --yellow:        #ca8a04;
+  --yellow-l:      #fefce8;
+  --yellow-b:      #fde68a;
+  --green:         #047857;
+  --green-l:       #ecfdf5;
+  --green-b:       #a7f3d0;
+
+  --display:       'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --sans:          'Onest', ui-sans-serif, system-ui, sans-serif;
+  --mono:          'JetBrains Mono', ui-monospace, monospace;
+
+  --r:             14px;
+  --rs:            9px;
+  --sidebar-w:     228px;
+  --top-h:         56px;
+
+  --shadow-sm:     0 1px 2px rgba(28,25,23,0.04);
+  --shadow:        0 6px 14px -4px rgba(28,25,23,0.06), 0 2px 6px -2px rgba(28,25,23,0.04);
+  --shadow-lg:     0 18px 40px -10px rgba(28,25,23,0.12), 0 6px 14px -6px rgba(28,25,23,0.06);
+  --shadow-xl:     0 32px 60px -14px rgba(28,25,23,0.18), 0 12px 24px -10px rgba(28,25,23,0.08);
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;overflow-x:hidden;overscroll-behavior:none}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-thumb{background:var(--grn);border-radius:2px}
-::-webkit-scrollbar-track{background:transparent}
 
-
-/* ── SOURCE STATUS BANNER ── */
-#srcBanner{
-  display:flex;align-items:center;gap:7px;padding:6px 14px;
-  font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
-  border-bottom:1px solid var(--brd);background:var(--bg2);color:var(--sub);
-  position:sticky;top:54px;z-index:200;
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:100%; min-height:100%; overflow-x:hidden; }
+body {
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  font-size:12px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  position:relative;
+  min-height:100vh;
 }
-#srcBanner.ok{color:var(--grn);border-color:rgba(0,255,135,.15)}
-#srcBanner.warn{color:var(--gold);border-color:rgba(255,193,7,.15)}
-#srcBanner.err{color:var(--red);border-color:rgba(255,59,92,.15)}
-.src-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:currentColor}
 
-/* ── NOISE OVERLAY ── */
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
-
-/* ══════════════════════════════════════
-   NAV
-══════════════════════════════════════ */
-#nav{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  height:54px;display:flex;align-items:center;gap:10px;padding:0 14px;
-  background:rgba(6,10,14,.97);border-bottom:1px solid rgba(0,255,135,.08);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+body::before {
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(720px 480px at 6% 4%,  rgba(34,45,101,0.10), transparent 62%),
+    radial-gradient(680px 500px at 96% 88%,rgba(74,90,158,0.08), transparent 66%);
+  pointer-events:none; z-index:-2;
 }
-.logo{display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0}
-.logo-ico{width:28px;height:28px;background:var(--grn);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 0 14px rgba(0,255,135,.4)}
-.logo-txt{font-family:'Barlow Condensed';font-size:20px;font-weight:900;letter-spacing:2px;color:var(--text);text-transform:uppercase}
-.logo-txt span{color:var(--grn)}
-.nav-tabs{display:flex;gap:1px;margin-left:4px}
-.nt{background:none;border:none;color:var(--sub);font-size:12px;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;transition:var(--t);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px;font-family:'Barlow'}
-.nt:hover{color:var(--text)}
-.nt.on{color:var(--grn);background:rgba(0,255,135,.08)}
-.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px}
-.live-pill{display:flex;align-items:center;gap:5px;background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.3);color:var(--red);padding:3px 10px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;flex-shrink:0}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-/* desktop search */
-.sw{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--brd);border-radius:50px;padding:5px 13px;width:170px;transition:var(--t)}
-.sw:focus-within{border-color:rgba(0,255,135,.4);width:220px;box-shadow:0 0 0 3px rgba(0,255,135,.08)}
-.sw input{background:none;border:none;outline:none;color:var(--text);font-size:12px;width:100%;font-family:'Barlow'}
-.sw input::placeholder{color:var(--sub)}
-/* mobile search icon */
-.msi-ico{display:none;width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--brd);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.msb{display:none;position:fixed;top:54px;left:0;right:0;z-index:299;background:rgba(6,10,14,.98);padding:8px 12px;border-bottom:1px solid var(--brd)}
-.msb.on{display:block}
-.msb input{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:9px 14px;color:var(--text);font-family:'Barlow';font-size:13px;outline:none}
-.msb input:focus{border-color:rgba(0,255,135,.4)}
 
-/* ══════════════════════════════════════
-   HERO BANNER — scoreboard aesthetic
-══════════════════════════════════════ */
-#hero{
-  margin-top:54px;position:relative;overflow:hidden;
-  background:var(--bg2);border-bottom:1px solid var(--brd);
-  padding:20px 14px 16px;
+::selection { background:var(--accent); color:#fff; }
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(28,25,23,0.16); border-radius:8px; border:2px solid transparent; background-clip:padding-box; }
+
+/* LOGIN */
+#login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); position:relative; }
+.login-card { background:var(--surface); backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.9); outline:1px solid var(--border); outline-offset:-1px; border-radius:var(--r); padding:40px; width:100%; max-width:380px; box-shadow:var(--shadow-xl); position:relative; z-index:1; }
+.login-brand { display:flex; align-items:center; gap:11px; margin-bottom:32px; }
+.login-mark { width:40px; height:40px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.login-mark img { width:100%; height:100%; object-fit:contain; }
+.login-title { font-family:var(--display); font-size:22px; font-weight:700; margin-bottom:6px; letter-spacing:-.5px; }
+.login-sub { font-size:12px; color:var(--t2); margin-bottom:28px; line-height:1.5; }
+.login-field { margin-bottom:14px; }
+.login-label { display:block; font-size:9.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--t3); margin-bottom:6px; }
+.login-input { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:var(--rs); font-family:var(--sans); font-size:13px; color:var(--text); background:rgba(255,255,255,0.9); outline:none; transition:all .15s; }
+.login-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); background:#fff; }
+.login-btn { width:100%; padding:11px; background:var(--accent-grad); color:#fff; border:none; border-radius:var(--rs); font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; margin-top:8px; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 6px 16px -4px rgba(34,45,101,0.4); }
+.login-btn:hover { background:#ffffff; color:var(--accent); box-shadow:0 6px 16px -4px rgba(34,45,101,0.3); border:1px solid var(--accent); }
+.login-spinner { display:none; width:14px; height:14px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+.login-check { display:flex; align-items:center; gap:8px; margin-bottom:16px; margin-top:-4px; }
+.login-check input { width:16px; height:16px; accent-color: var(--accent); cursor:pointer; }
+.login-check label { font-size:11px; color:var(--t2); cursor:pointer; user-select:none; font-weight:500; }
+
+/* APP */
+#app-page { display:none; }
+.layout { display:flex; width:100%; min-height:100vh; position:relative; z-index:0; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width:var(--sidebar-w); min-width:var(--sidebar-w); flex-shrink:0; background:rgba(255,255,255,0.85); backdrop-filter:blur(24px) saturate(1.6); border-right:1px solid var(--border); height:100vh; display:flex; flex-direction:column; z-index:100; }
+.brand { padding:16px 18px 14px; display:flex; align-items:center; gap:11px; border-bottom:1px solid var(--border); }
+.brand-mark { width:36px; height:36px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.brand-mark img { width:100%; height:100%; object-fit:contain; }
+.brand-name { font-family:var(--display); font-size:15px; font-weight:700; color:var(--text); letter-spacing:-.4px; }
+.brand-sub { font-size:9.5px; color:var(--t3); font-family:var(--mono); margin-top:1px; letter-spacing:.5px; text-transform:uppercase; }
+.nav { flex:1; overflow-y:auto; padding:12px 10px 14px; }
+.nav-item { display:flex; align-items:center; gap:11px; padding:9px 11px; cursor:pointer; border:none; background:none; width:100%; text-align:left; font-family:var(--sans); font-size:12px; font-weight:500; color:var(--t2); border-radius:9px; transition:all .15s; white-space:nowrap; position:relative; margin-bottom:1px; }
+.nav-item:hover { color:var(--text); background:rgba(28,25,23,0.045); }
+.nav-item.active { color:var(--accent); background:rgba(34,45,101,0.09); font-weight:600; }
+.nav-item.active::before { content:''; position:absolute; left:-10px; top:7px; bottom:7px; width:3px; border-radius:0 3px 3px 0; background:var(--accent-grad); }
+.nav-ico { width:16px; text-align:center; font-size:13px; color:var(--t3); transition:color .18s; }
+.nav-item:hover .nav-ico { color:var(--t2); }
+.nav-item.active .nav-ico { color:var(--accent); }
+.nav-badge { margin-left:auto; background:var(--red); color:#fff; font-size:9px; font-weight:700; font-family:var(--mono); padding:2px 6px; border-radius:12px; display:none; box-shadow:0 2px 6px rgba(220,38,38,0.35); }
+.nav-badge.show { display:block; }
+.sidebar-foot { padding:12px 18px 14px; border-top:1px solid var(--border); }
+.logout-btn { width:100%; padding:8px 11px; background:transparent; border:1px solid var(--border); color:var(--t3); font-family:var(--sans); font-size:11px; font-weight:500; border-radius:7px; cursor:pointer; transition:all .15s; }
+.logout-btn:hover { border-color:var(--red); color:var(--red); background:var(--red-l); }
+
+/* MAIN */
+.main { flex:1; margin-left: var(--sidebar-w); min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; min-width:0; }
+.topbar { position:sticky; top:0; z-index:50; height:var(--top-h); background:rgba(255,255,255,0.90); backdrop-filter:blur(18px) saturate(1.6); border-bottom:1px solid var(--border); padding:0 24px; display:flex; align-items:center; gap:14px; }
+.topbar-left { flex:1; display:flex; flex-direction:column; justify-content:center; }
+.topbar-title { font-family:var(--display); font-size:20px; font-weight:700; letter-spacing:-.5px; color:var(--text); line-height:1.1; }
+.topbar-sub { font-size:11px; color:var(--t3); margin-top:2px; font-family:var(--mono); }
+.refresh-btn { display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border-radius:9px; border:1px solid var(--border); background:rgba(255,255,255,0.9); color:var(--t2); font-family:var(--sans); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
+.refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
+.refresh-btn .spin { display:inline-flex; }
+.refresh-btn.loading .spin { animation:spin .9s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.content { padding:18px 24px 32px; flex:1; }
+.page { display:none; }
+.page.active { display:block; animation:fadeUp .32s cubic-bezier(.22,1,.36,1); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:7px 13px; border-radius:9px; border:1px solid var(--border); background:rgba(255,255,255,0.95); color:var(--t2); font-family:var(--sans); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; white-space:nowrap; }
+.btn:hover { border-color:var(--accent); color:var(--accent); background:#fff; transform:translateY(-1px); box-shadow:0 4px 10px -4px rgba(34,45,101,0.25); }
+.btn-green { background:var(--green-l); color:var(--green); border-color:var(--green-b); }
+.btn-green:hover { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-red { background:var(--red-l); color:var(--red); border-color:var(--red-b); }
+.btn-red:hover { background:var(--red); color:#fff; border-color:var(--red); }
+.btn-accent { background:var(--accent-grad); color:#fff; border-color:transparent; box-shadow:0 6px 16px -4px rgba(34,45,101,0.4); }
+.btn-accent:hover { background:#ffffff; color:var(--accent); border:1px solid var(--accent); box-shadow:0 6px 16px -4px rgba(34,45,101,0.3); }
+.btn-sm { padding:5px 10px; font-size:11px; border-radius:7px; }
+
+/* KPI */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:12px; margin-bottom:16px; }
+.kpi { background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.9); outline:1px solid var(--border); outline-offset:-1px; border-radius:var(--r); padding:14px 16px; position:relative; overflow:hidden; box-shadow:var(--shadow-sm); }
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); }
+.kpi::after { content:''; position:absolute; right:-30px; top:-30px; width:90px; height:90px; border-radius:50%; background:radial-gradient(circle at center, rgba(34,45,101,0.08), transparent 70%); pointer-events:none; }
+.kpi.red::before { background:linear-gradient(90deg, var(--red), #f87171); }
+.kpi.ora::before { background:linear-gradient(90deg, var(--orange), #fb923c); }
+.kpi.yel::before { background:linear-gradient(90deg, var(--yellow), var(--amber-b)); }
+.kpi.grn::before { background:var(--accent-grad); }
+.kpi.blu::before, .kpi.acc::before { background:var(--accent-grad); }
+.kpi.neu::before { background:linear-gradient(90deg, var(--t2), var(--t3)); }
+.kpi.red::after { background:radial-gradient(circle at center, rgba(220,38,38,0.10), transparent 70%); }
+.kpi.ora::after { background:radial-gradient(circle at center, rgba(234,88,12,0.10), transparent 70%); }
+.kpi-label { font-size:9.5px; font-weight:600; color:var(--t3); letter-spacing:.8px; text-transform:uppercase; margin-bottom:8px; }
+.kpi-value { font-family:var(--display); font-size:26px; font-weight:700; line-height:1; letter-spacing:-.6px; color:var(--text); }
+.kpi-sub { font-size:10.5px; color:var(--t3); margin-top:6px; font-weight:500; }
+
+/* PANELS */
+.panel { background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.9); outline:1px solid var(--border); outline-offset:-1px; border-radius:var(--r); overflow:hidden; margin-bottom:16px; box-shadow:var(--shadow-sm); }
+.panel-head { padding:13px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; background:rgba(255,255,255,0.60); }
+.panel-title { font-family:var(--display); font-size:14.5px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
+.panel-title-sub { font-size:11px; color:var(--t3); margin-top:3px; font-weight:500; }
+.panel-badge { font-family:var(--mono); font-size:10px; color:var(--t2); background:rgba(28,25,23,0.05); border:1px solid var(--border); border-radius:10px; padding:3px 10px; font-weight:600; }
+.panel-body { padding:18px; }
+
+/* FILTER BAR */
+.filter-bar { position: relative; z-index: 20; background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.9); outline:1px solid var(--border); outline-offset:-1px; border-radius:var(--r); padding:14px 18px; margin-bottom:16px; box-shadow:var(--shadow-sm); }
+.filter-bar-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+.fg { display:flex; flex-direction:column; gap:5px; }
+.fl { font-size:9.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--t3); }
+.fs { background:rgba(255,255,255,0.95); border:1px solid var(--border); color:var(--text); border-radius:9px; padding:7px 28px 7px 11px; font-family:var(--sans); font-size:12px; cursor:pointer; min-width:100px; outline:none; appearance:none; font-weight:500; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a8a29e' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; transition:all .15s; }
+.fs:hover { border-color:var(--t3); background-color:#fff; }
+.fs:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); background-color:#fff; }
+.rbtn { padding:7px 11px; border-radius:7px; background:transparent; border:1px solid var(--border); color:var(--t3); font-size:11px; cursor:pointer; font-family:var(--sans); transition:all .15s; align-self:flex-end; font-weight:500; }
+.rbtn:hover { border-color:var(--red); color:var(--red); background:var(--red-l); }
+
+/* TABLE */
+.tw { overflow-x:auto; }
+.ts { max-height:480px; overflow-y:auto; }
+table { width:100%; border-collapse:separate; border-spacing:0; font-size:12px; min-width:600px; }
+thead th { background:rgba(241,244,249,0.95); backdrop-filter:blur(8px); color:var(--t2); font-size:9.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; padding:9px 12px; text-align:left; position:sticky; top:0; border-bottom:1px solid var(--border); white-space:nowrap; z-index:1; }
+thead th:first-child, tbody td:first-child { width:32px; text-align:center; }
+tbody tr { border-bottom:1px solid rgba(28,25,23,0.05); transition:background .12s; }
+tbody tr:hover { background:rgba(34,45,101,0.045); }
+tbody td { padding:8px 12px; vertical-align:middle; color:var(--text); border-bottom:1px solid rgba(28,25,23,0.05); white-space: nowrap; }
+td.b { font-weight:600; }
+td.mono { font-family:var(--mono); font-size:11px; }
+td.r { text-align:right; }
+
+/* HIGHLIGHT PILLS */
+.pill { display:inline-flex; align-items:center; padding:3px 8px; border-radius:6px; font-size:10.5px; font-weight:600; border: 1px solid transparent; }
+.pill-transfer { background: rgba(34,45,101,0.08); color: var(--accent); border-color: rgba(34,45,101,0.15); }
+.pill-rtc { background: var(--red-l); color: var(--red); border-color: var(--red-b); }
+
+/* COMPACT TABLE for Dashboard Cards (No Side Scroll) */
+.compact-table { width: 100% !important; min-width: 0 !important; table-layout: fixed; }
+.compact-table th, .compact-table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.compact-table td.wrap { white-space: normal; word-break: break-word; }
+
+/* RESIZABLE COLUMNS */
+.compact-table th { position: relative; }
+.col-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 10;
 }
-.hero-glow{position:absolute;top:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,135,.07) 0%,transparent 70%);pointer-events:none}
-.hero-glow2{position:absolute;bottom:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,0,.06) 0%,transparent 70%);pointer-events:none}
-.hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.hero-left h1{font-family:'Barlow Condensed';font-size:clamp(26px,6vw,42px);font-weight:900;text-transform:uppercase;letter-spacing:2px;line-height:1;margin-bottom:6px}
-.hero-left h1 span{color:var(--grn);text-shadow:0 0 20px rgba(0,255,135,.4)}
-.hero-left p{font-size:12px;color:var(--sub);max-width:320px;line-height:1.55}
-.hero-stats{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-.hstat{background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:8px 14px;text-align:center}
-.hstat-n{font-family:'Barlow Condensed';font-size:22px;font-weight:800;color:var(--grn)}
-.hstat-l{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
-.hero-right{flex-shrink:0}
-.sport-ico-wrap{display:flex;gap:8px}
-.sport-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--brd);background:var(--bg3);cursor:pointer;transition:var(--t)}
-.sport-ico:hover,.sport-ico.on{border-color:var(--grn);background:rgba(0,255,135,.1);box-shadow:0 0 12px rgba(0,255,135,.2)}
-
-/* ══════════════════════════════════════
-   FILTER CHIPS
-══════════════════════════════════════ */
-.chips{display:flex;gap:6px;padding:14px 14px 0;overflow-x:auto;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{padding:6px 14px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);color:var(--sub);background:var(--bg3);transition:var(--t);white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:.5px;font-family:'Barlow'}
-.chip:hover{border-color:rgba(0,255,135,.3);color:var(--text)}
-.chip.on{background:var(--grn);border-color:var(--grn);color:#000;font-weight:700}
-
-/* ══════════════════════════════════════
-   SECTIONS
-══════════════════════════════════════ */
-.sec{padding:18px 14px}
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
-.st{font-family:'Barlow Condensed';font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:7px}
-.st-bar{width:3px;height:18px;background:var(--grn);border-radius:2px;flex-shrink:0}
-.live-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;animation:pulse 1.5s infinite}
-
-/* ══════════════════════════════════════
-   MATCH CARDS
-══════════════════════════════════════ */
-.match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-.mcard{
-  background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);
-  padding:14px;cursor:pointer;transition:var(--t);position:relative;overflow:hidden;
+.col-resizer:hover, .col-resizer.active {
+  background-color: rgba(34, 45, 101, 0.2);
 }
-.mcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brd);transition:var(--t)}
-.mcard:hover{border-color:rgba(0,255,135,.25);transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.6)}
-.mcard:hover::before{background:var(--grn)}
-.mcard:active{transform:scale(.98)}
-.mc-sport{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.mc-sport-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);display:flex;align-items:center;gap:5px}
-.mc-time{font-size:10px;color:var(--grn);font-weight:600;background:rgba(0,255,135,.08);padding:2px 7px;border-radius:4px;border:1px solid rgba(0,255,135,.15)}
-.mc-live-now{font-size:9px;color:var(--red);font-weight:700;background:rgba(255,59,92,.1);padding:2px 7px;border-radius:4px;border:1px solid rgba(255,59,92,.2);display:flex;align-items:center;gap:4px;animation:pulse 1.5s infinite}
-.mc-event{font-family:'Barlow Condensed';font-size:16px;font-weight:700;line-height:1.2;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-.mc-channels{display:flex;gap:5px;flex-wrap:wrap}
-.mc-ch{background:var(--bg3);border:1px solid var(--brd);color:var(--sub);padding:3px 8px;border-radius:5px;font-size:10px;font-weight:500;display:flex;align-items:center;gap:4px;transition:var(--t)}
-.mc-ch:hover{border-color:var(--grn);color:var(--grn)}
-.ch-ico{width:14px;height:14px;border-radius:2px;object-fit:contain;background:var(--bg4)}
 
-/* horizontal scroll row */
-.hrow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.hrow .mcard{min-width:260px;max-width:300px;flex-shrink:0}
+/* BADGES */
+.badge { display:inline-flex; align-items:center; padding:3px 8px; border-radius:20px; font-size:9.5px; font-weight:600; white-space:nowrap; border:1px solid transparent; }
+.badge.crit { background:var(--red-l); color:var(--red); border-color:var(--red-b); }
+.badge.high { background:var(--orange-l); color:var(--orange); border-color:var(--orange-b); }
+.badge.med { background:var(--yellow-l); color:var(--yellow); border-color:var(--yellow-b); }
+.badge.low { background:var(--green-l); color:var(--green); border-color:var(--green-b); }
+.badge.na { background:rgba(28,25,23,0.05); color:var(--t3); border-color:var(--border); }
 
-/* channels grid */
-.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.chcard{
-  background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);
-  padding:14px 10px;cursor:pointer;transition:var(--t);text-align:center;
-  display:flex;flex-direction:column;align-items:center;gap:7px;
+
+/* G-LIST / AG GRID */
+.glist-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.glist-toolbar .btn { min-height:32px; }
+.glist-search { min-width:190px; }
+.glist-grid-wrap { overflow:hidden; border-radius:10px; }
+#glist-grid {
+  width:100%;
+  height:calc(100vh - 355px);
+  min-height:420px;
+  --ag-font-family:var(--sans);
+  --ag-font-size:12px;
+  --ag-foreground-color:var(--text);
+  --ag-background-color:#fff;
+  --ag-header-background-color:#f1f4f9;
+  --ag-header-foreground-color:var(--t2);
+  --ag-border-color:rgba(28,25,23,.09);
+  --ag-row-border-color:rgba(28,25,23,.055);
+  --ag-selected-row-background-color:rgba(34,45,101,.08);
+  --ag-range-selection-border-color:var(--accent);
+  --ag-range-selection-background-color:rgba(34,45,101,.10);
+  --ag-input-focus-border-color:var(--accent);
+  --ag-checkbox-checked-color:var(--accent);
+  --ag-header-column-resize-handle-color:rgba(34,45,101,.35);
 }
-.chcard:hover{border-color:rgba(0,255,135,.25);background:rgba(0,255,135,.03);transform:translateY(-3px)}
-.chcard:active{transform:scale(.97)}
-.chcard-logo{width:48px;height:32px;object-fit:contain;border-radius:4px}
-.chcard-name{font-size:10px;font-weight:600;color:var(--sub);text-align:center;line-height:1.3}
-.chcard-live{font-size:9px;color:var(--red);font-weight:700;text-transform:uppercase}
-
-/* skeleton */
-.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:var(--rad)}
-@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-.empty{grid-column:1/-1;text-align:center;padding:50px 0;color:var(--sub);font-size:13px}
-.empty-ico{font-size:36px;margin-bottom:10px;display:block}
-
-/* ══════════════════════════════════════
-   PLAYER MODAL
-══════════════════════════════════════ */
-#pm{
-  position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.97);
-  display:none;flex-direction:column;overflow:hidden;
+#glist-grid .ag-header-cell-label { font-weight:600; letter-spacing:.15px; }
+#glist-grid .ag-cell { display:flex; align-items:center; }
+#glist-grid .ag-row-hover { background:rgba(34,45,101,.035) !important; }
+#glist-grid .ag-cell-focus:not(.ag-cell-range-selected) { border-color:var(--accent) !important; }
+.glist-mono { font-family:var(--mono); font-size:11px; }
+.glist-meta { display:flex; align-items:center; gap:10px; color:var(--t3); font-size:10.5px; }
+.glist-empty { text-align:center; padding:42px 20px; color:var(--t3); }
+.glist-empty i { font-size:30px; margin-bottom:10px; display:block; }
+.glist-kpi-grid { margin-bottom:16px; }
+.glist-refreshing { opacity:.72; pointer-events:none; }
+@media(max-width:900px){
+  #glist-grid { height:calc(100vh - 430px); min-height:360px; }
+  .glist-search { min-width:150px; flex:1; }
 }
-#pm.on{display:flex}
-.pmtop{
-  flex-shrink:0;display:flex;align-items:center;gap:8px;padding:10px 12px;
-  background:var(--bg2);border-bottom:1px solid rgba(0,255,135,.1);
-}
-.pmclose{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--t)}
-.pmclose:hover{background:var(--red)}
-.pmtitle{font-family:'Barlow Condensed';font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pmctrls{display:flex;gap:5px;flex-shrink:0}
-.pmbtn{background:var(--bg3);border:1px solid var(--brd);color:var(--text);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:var(--t);white-space:nowrap;font-family:'Barlow'}
-.pmbtn:hover{border-color:var(--grn);color:var(--grn)}
-.extbtn{background:var(--grn);color:#000;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:var(--t);white-space:nowrap;font-family:'Barlow'}
-.extbtn:hover{background:var(--grn2)}
 
-/* server row */
-.srvrow{flex-shrink:0;display:flex;gap:5px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--brd);overflow-x:auto;scrollbar-width:none}
-.srvrow::-webkit-scrollbar{display:none}
-.srv{background:var(--bg3);border:1px solid var(--brd);color:var(--text);padding:4px 11px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:var(--t);white-space:nowrap;flex-shrink:0;font-family:'Barlow'}
-.srv:hover{border-color:rgba(0,255,135,.4);color:var(--grn)}
-.srv.on{border-color:var(--grn);color:var(--grn);background:rgba(0,255,135,.08)}
+/* OVERLAY / POPUP */
+.overlay { display:none; position:fixed; inset:0; background:rgba(15,15,10,0.42); backdrop-filter:blur(8px); z-index:500; align-items:center; justify-content:center; padding:24px; }
+.overlay.open { display:flex; }
+.popup { background:rgba(255,255,255,0.98); border:1px solid rgba(255,255,255,0.7); outline:1px solid var(--border); outline-offset:-1px; border-radius:18px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-xl); animation:popIn .28s cubic-bezier(.22,1,.36,1); position:relative; }
+@keyframes popIn { from{opacity:0; transform:scale(.96) translateY(14px)} to{opacity:1; transform:scale(1) translateY(0)} }
+.popup::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:var(--accent-grad); border-radius:18px 18px 0 0; }
+.popup-head { padding:20px 24px 14px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.popup-title { font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-.4px; color:var(--text); }
+.popup-sub { font-size:11px; color:var(--t3); margin-top:4px; font-family:var(--mono); }
+.popup-close { background:rgba(28,25,23,0.05); border:1px solid var(--border); color:var(--t2); font-size:13px; cursor:pointer; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:9px; transition:.15s; flex-shrink:0; }
+.popup-close:hover { background:var(--red); color:#fff; border-color:var(--red); }
+.popup-body { padding:20px 24px; }
+.popup-foot { padding:14px 24px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; }
 
-/* player frame */
-.pframe{flex:1;position:relative;background:#000;min-height:0}
-.pframe iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
-.pload{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#000;z-index:2}
-.pload.gone{display:none}
-.spin{width:36px;height:36px;border:3px solid rgba(0,255,135,.15);border-top-color:var(--grn);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.pload p{font-size:12px;color:var(--sub);font-family:'Barlow Condensed';letter-spacing:.8px;text-transform:uppercase}
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group.full { grid-column:1/-1; }
+.form-label { font-size:9.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--t3); }
+.form-input { padding:10px 12px; border:1px solid var(--border); border-radius:9px; font-family:var(--sans); font-size:13px; color:var(--text); background:rgba(255,255,255,0.95); outline:none; transition:all .15s; width:100%; }
+.form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); background:#fff; }
 
-/* ══════════════════════════════════════
-   EXT PLAYER SHEET
-══════════════════════════════════════ */
-#eps{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);display:none;align-items:flex-end;justify-content:center}
-#eps.on{display:flex}
-.epbox{background:var(--bg2);border:1px solid rgba(0,255,135,.15);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px;animation:slideUp .28s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.eph{font-family:'Barlow Condensed';font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.epdesc{font-size:11px;color:var(--sub);margin-bottom:16px}
-.epbtns{display:flex;flex-direction:column;gap:7px}
-.epbtn{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:12px 14px;cursor:pointer;transition:var(--t);width:100%;text-align:left}
-.epbtn:hover{border-color:rgba(0,255,135,.3)}
-.epbtn.prim{border-color:rgba(0,255,135,.3);background:rgba(0,255,135,.06)}
-.epbtn:active{transform:scale(.98)}
-.ep-ico{font-size:20px;flex-shrink:0}
-.ep-info .ep-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px;font-family:'Barlow'}
-.ep-info .ep-sub{font-size:10px;color:var(--sub)}
-.epcancel{width:100%;margin-top:10px;background:transparent;color:var(--sub);border:none;padding:8px;font-size:12px;cursor:pointer;font-family:'Barlow'}
+/* WEEK COMPARE */
+.wk-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:11px; }
+.wk-cell { padding:12px 11px; border-radius:11px; background:rgba(255,255,255,0.95); border:1px solid var(--border); text-align:center; }
+.wk-cell-label { font-size:9.5px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--t3); margin-bottom:7px; font-family:var(--mono); }
+.wk-cell-val { font-family:var(--display); font-size:23px; font-weight:700; color:var(--text); line-height:1; }
+.wk-cell-trend { font-size:10px; color:var(--t3); margin-top:5px; font-weight:500; }
+.wk-cell.up { border-color:var(--red-b); background:var(--red-l); }
+.wk-cell.up .wk-cell-val { color:var(--red); }
+.wk-cell.dn { border-color:var(--green-b); background:var(--green-l); }
+.wk-cell.dn .wk-cell-val { color:var(--green); }
 
-/* ══════════════════════════════════════
-   TOAST
-══════════════════════════════════════ */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:700;background:var(--bg3);border:1px solid var(--grn);color:var(--text);padding:10px 18px;border-radius:10px;font-size:12px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s;box-shadow:0 6px 24px rgba(0,0,0,.5);font-family:'Barlow'}
-#toast.show{opacity:1}
+/* STATUS */
+.status-bar { display:flex; gap:8px; padding:14px 24px 0; flex-wrap:wrap; }
+.status-chip { display:inline-flex; align-items:center; gap:8px; padding:5px 11px; border-radius:20px; background:rgba(255,255,255,0.90); border:1px solid var(--border); font-size:11px; font-weight:500; color:var(--t2); }
+.sdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.sdot.ok { background:var(--accent-soft); box-shadow:0 0 0 3px rgba(34,45,101,0.18); }
+.sdot.err { background:var(--red); box-shadow:0 0 0 3px rgba(220,38,38,0.18); }
+.sdot.loading { background:var(--amber); animation:pulse 1.2s ease infinite; }
+@keyframes pulse { 0%,100% { opacity:.4; transform:scale(.85); } 50% { opacity:1; transform:scale(1); } }
 
-footer{padding:16px 14px;border-top:1px solid var(--brd);text-align:center;color:var(--sub);font-size:10px;font-family:'Barlow'}
+/* TOAST */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(28,25,23,0.94); color:#fff; font-family:var(--sans); font-size:12.5px; font-weight:500; padding:11px 20px; border-radius:11px; z-index:99999; opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.22,1,.36,1); box-shadow:var(--shadow-xl); border:1px solid rgba(255,255,255,0.1); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.success { background:linear-gradient(135deg, #047857, #059669); }
+.toast.error { background:linear-gradient(135deg, #b91c1c, #dc2626); }
 
-/* ══════════════════════════════════════
-   MOBILE
-══════════════════════════════════════ */
-@media(max-width:600px){
-  #nav{height:50px;padding:0 10px;gap:6px}
-  .logo-ico{width:26px;height:26px}
-  .logo-txt{font-size:17px}
-  .nt{font-size:11px;padding:4px 7px}
-  .sw{display:none}
-  .msi-ico{display:flex}
-  .live-pill{display:none}
+/* STAFF LIST */
+.staff-card { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(255,255,255,0.95); border:1px solid var(--border); border-radius:9px; margin-bottom:8px; }
+.staff-name { font-weight:600; font-size:13px; }
 
-  #hero{padding:14px 10px 12px}
-  .hero-left h1{font-size:26px}
-  .hero-stats{gap:7px}
-  .hstat{padding:6px 11px}
-  .hstat-n{font-size:18px}
-  .sport-ico{width:38px;height:38px;font-size:17px}
-
-  .chips{padding:10px 10px 0}
-  .sec{padding:14px 10px}
-  .match-grid{grid-template-columns:1fr}
-  .ch-grid{grid-template-columns:repeat(3,1fr);gap:7px}
-  .chcard{padding:10px 6px}
-  .chcard-logo{width:38px;height:26px}
-  .chcard-name{font-size:9px}
-
-  .pmtitle{font-size:13px}
-  .srv{font-size:10px;padding:3px 8px}
-}
-@media(max-width:380px){
-  .logo-txt{font-size:15px;letter-spacing:1px}
-  .nt{font-size:10px;padding:3px 5px}
+@media(max-width:900px) {
+  :root { --sidebar-w:100%; }
+  .layout { flex-direction:column; }
+  .sidebar { width:100%; height:auto; position:relative; }
+  .main { margin-left:0; }
+  .form-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <div class="logo" onclick="goHome()">
-    <div class="logo-ico">⚡</div>
-    <div class="logo-txt">Kick<span>Off V2</span></div>
-  </div>
-  <div class="nav-tabs">
-    <button class="nt on" id="ntHome" onclick="navTo('home',this)">Home</button>
-    <button class="nt" id="ntCricket" onclick="navTo('cricket',this)">Cricket</button>
-    <button class="nt" id="ntFootball" onclick="navTo('football',this)">Football</button>
-    <button class="nt" id="ntChannels" onclick="navTo('channels',this)">Channels</button>
-  </div>
-  <div class="nav-r">
-    <div class="live-pill"><span class="live-dot"></span>LIVE</div>
-    <div class="sw">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b8299" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Search matches..." id="si" oninput="doSearch(this.value)" autocomplete="off">
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-mark">
+        <img src="https://i.ibb.co/rfGVJp3F/Gala-EXP-2-removebg-preview-2.png" alt="Gala Markets Logo">
+      </div>
+      <div>
+        <div class="brand-name">Gala Markets</div>
+        <div class="brand-sub">Store Expiry Dashboard</div>
+      </div>
     </div>
-    <div class="msi-ico" onclick="toggleMS()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="login-title">Store Login</div>
+    <div class="login-sub">Enter your Store Code and password to access your expiry dashboard.</div>
+    <div class="login-field">
+      <label class="login-label">Store Code (Username)</label>
+      <input class="login-input" id="login-code" type="text" placeholder="e.g. 9217" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-check">
+      <input type="checkbox" id="remember-me">
+      <label for="remember-me">Remember my credentials on this device</label>
+    </div>
+    <div id="login-error" style="font-size:11px; color:var(--red); margin-top:8px; display:none;"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      <div class="login-spinner" id="login-spinner"></div>
+      Sign In →
+    </button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-page">
+<div class="layout">
+
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <img src="https://i.ibb.co/rfGVJp3F/Gala-EXP-2-removebg-preview-2.png" alt="Gala Markets Logo">
+    </div>
+    <div>
+      <div class="brand-name">Gala Markets</div>
+      <div class="brand-sub" id="sb-store-label">—</div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-item active" onclick="go('dashboard')" id="n-dashboard">
+      <i class="fa-solid fa-gauge-high nav-ico"></i><span>Overview</span>
+    </button>
+    <button class="nav-item" onclick="go('review')" id="n-review">
+      <i class="fa-solid fa-clipboard-check nav-ico"></i><span>Review / This Week</span>
+    </button>
+    <button class="nav-item" onclick="go('buyerAction')" id="n-buyerAction">
+      <i class="fa-solid fa-bolt-lightning nav-ico"></i><span>Buyer's Action</span>
+      <span class="nav-badge" id="nb-buyerAction">0</span>
+    </button>
+    <button class="nav-item" onclick="go('history')" id="n-history">
+      <i class="fa-solid fa-database nav-ico"></i><span>History</span>
+    </button>
+    <button class="nav-item" onclick="go('glist')" id="n-glist">
+      <i class="fa-solid fa-table nav-ico"></i><span>G-List</span>
+    </button>
+    <button class="nav-item" onclick="go('staff')" id="n-staff">
+      <i class="fa-solid fa-users nav-ico"></i><span>Manage Staff</span>
+    </button>
+  </div>
+  <div class="sidebar-foot">
+    <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</button>
   </div>
 </nav>
 
-<!-- MOBILE SEARCH -->
-<div class="msb" id="msb">
-  <input type="text" placeholder="Search matches, teams, channels..." id="msi" oninput="doSearch(this.value)" autocomplete="off">
-</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="ptitle">Overview</div>
+      <div class="topbar-sub" id="ptitle-sub">—</div>
+    </div>
+    <button class="refresh-btn" onclick="loadData()" id="rfbtn">
+      <i class="fa-solid fa-arrows-rotate spin"></i> Refresh
+    </button>
+  </div>
 
-<!-- SOURCE STATUS -->
-<div id="srcBanner"><div class="src-dot"></div><span id="srcTxt">Connecting to stream sources...</span></div>
+  <div class="status-bar">
+    <div class="status-chip"><div class="sdot loading" id="sdot"></div><span id="sinfo" style="color:var(--t2)">Loading…</span></div>
+  </div>
 
-<!-- HERO -->
-<div id="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
-  <div class="hero-inner">
-    <div class="hero-left">
-      <h1>Watch Live<br><span>Sports Free</span></h1>
-      <p>Cricket, Football &amp; 500+ live TV channels. No subscription, no login — just stream.</p>
-      <div class="hero-stats">
-        <div class="hstat"><div class="hstat-n" id="statEvents">—</div><div class="hstat-l">Live Events</div></div>
-        <div class="hstat"><div class="hstat-n">500+</div><div class="hstat-l">Channels</div></div>
-        <div class="hstat"><div class="hstat-n">HD</div><div class="hstat-l">Quality</div></div>
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="filter-bar">
+        <div class="filter-bar-row">
+          <div class="fg"><div class="fl">Month</div><select class="fs" id="dash-ym" onchange="renderDashboard()"><option value="">All Months</option></select></div>
+          <div class="fg"><div class="fl">Week</div>
+            <select class="fs" id="dash-week" onchange="renderDashboard()">
+              <option value="">All Weeks</option>
+              <option value="Week 1">Week 1</option>
+              <option value="Week 2">Week 2</option>
+              <option value="Week 3">Week 3</option>
+              <option value="Week 4">Week 4</option>
+            </select>
+          </div>
+          <div class="fg"><div class="fl">Department</div><select class="fs" id="dash-dept" onchange="renderDashboard()"><option value="">All Departments</option></select></div>
+          <div class="fg"><div class="fl">Staff</div><select class="fs" id="dash-staff" onchange="renderDashboard()"><option value="">All Staff</option></select></div>
+          <button class="rbtn" onclick="resetDash()"><i class="fa-solid fa-xmark"></i> Reset</button>
+          <button class="btn btn-green" onclick="exportDashXL()" style="align-self:flex-end"><i class="fa-solid fa-file-excel"></i> Export To Excel</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpi-dash"></div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <!-- Expired Items -->
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title"><i class="fa-solid fa-ban" style="color:var(--red)"></i> Expired Items</div><div class="panel-title-sub">Remove from shelf immediately</div></div>
+            <span class="panel-badge" id="exp-badge">—</span>
+          </div>
+          <div class="tw ts" style="max-height:280px;">
+            <table id="t-expired" class="compact-table">
+              <colgroup>
+                <col style="width:15%"><col style="width:55%"><col style="width:15%"><col style="width:15%">
+              </colgroup>
+              <thead><tr><th>Article</th><th>Description</th><th>Stock</th><th>Expiry</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Expiring within 7 days -->
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> Expiring Within 7 Days</div><div class="panel-title-sub">Action needed soon</div></div>
+            <span class="panel-badge" id="exp7-badge">—</span>
+          </div>
+          <div class="tw ts" style="max-height:280px;">
+            <table id="t-exp7" class="compact-table">
+              <colgroup>
+                <col style="width:15%"><col style="width:45%"><col style="width:15%"><col style="width:15%"><col style="width:10%">
+              </colgroup>
+              <thead><tr><th>Article</th><th>Description</th><th>Stock</th><th>Expiry</th><th>Days Left</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div class="panel"><div class="panel-head"><div class="panel-title">Stock by Risk Bucket</div></div><div class="panel-body" id="dash-chart"></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Week-over-Week</div><span class="panel-badge" id="dash-wk-badge">—</span></div><div class="panel-body"><div class="wk-grid" id="dash-wk"></div></div></div>
       </div>
     </div>
-    <div class="hero-right">
-      <div class="sport-ico-wrap">
-        <div class="sport-ico on" onclick="filterSport('all',this)" title="All">🌍</div>
-        <div class="sport-ico" onclick="filterSport('cricket',this)" title="Cricket">🏏</div>
-        <div class="sport-ico" onclick="filterSport('football',this)" title="Football">⚽</div>
-        <div class="sport-ico" onclick="filterSport('tennis',this)" title="Tennis">🎾</div>
-        <div class="sport-ico" onclick="filterSport('basketball',this)" title="Basketball">🏀</div>
+
+    <!-- ══ REVIEW ══ -->
+    <div class="page" id="page-review">
+      <div class="filter-bar">
+        <div class="filter-bar-row">
+          <div class="fg"><div class="fl">Week</div>
+            <select class="fs" id="rev-week" onchange="renderReview()">
+              <option value="">All Weeks</option>
+              <option value="Week 1">Week 1</option>
+              <option value="Week 2">Week 2</option>
+              <option value="Week 3">Week 3</option>
+              <option value="Week 4">Week 4</option>
+            </select>
+          </div>
+          <div class="fg"><div class="fl">Month</div><select class="fs" id="rev-ym" onchange="renderReview()"><option value="">All Months</option></select></div>
+          <div class="fg"><div class="fl">Department</div><select class="fs" id="rev-dept" onchange="renderReview()"><option value="">All Departments</option></select></div>
+          <div class="fg"><div class="fl">Staff</div><select class="fs" id="rev-staff" onchange="renderReview()"><option value="">All Staff</option></select></div>
+          <button class="btn btn-green" onclick="exportRevXL()" style="align-self:flex-end"><i class="fa-solid fa-file-excel"></i> Export To Excel</button>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpi-rev"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Submitted Items</div><div class="panel-title-sub">Review your expiry submissions for this period</div></div>
+          <span class="panel-badge" id="b-rev">—</span>
+        </div>
+        <div class="tw ts"><table id="t-rev">
+          <thead><tr><th>Week</th><th>Month</th><th>Article</th><th>Description</th><th>Dept</th><th>Stock</th><th>Expiry</th><th>Days Left</th><th>Risk</th><th>Staff</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- SPORT CHIPS -->
-<div class="chips" id="chips">
-  <div class="chip on" onclick="setChip('all',this)">🌍 All Sports</div>
-  <div class="chip" onclick="setChip('cricket',this)">🏏 Cricket</div>
-  <div class="chip" onclick="setChip('football',this)">⚽ Football</div>
-  <div class="chip" onclick="setChip('tennis',this)">🎾 Tennis</div>
-  <div class="chip" onclick="setChip('basketball',this)">🏀 Basketball</div>
-  <div class="chip" onclick="setChip('mma',this)">🥊 MMA/Boxing</div>
-  <div class="chip" onclick="setChip('motorsport',this)">🏎️ Motorsport</div>
-  <div class="chip" onclick="setChip('golf',this)">⛳ Golf</div>
-</div>
+    <!-- ══ BUYER'S ACTION ══ -->
+    <div class="page" id="page-buyerAction">
+      <div class="filter-bar">
+        <div class="filter-bar-row">
+          <div class="fg"><div class="fl">Month</div><select class="fs" id="ba-ym" onchange="renderBuyerAction()"><option value="">All Months</option></select></div>
+          <div class="fg"><div class="fl">Week</div>
+            <select class="fs" id="ba-week" onchange="renderBuyerAction()">
+              <option value="">All Weeks</option>
+              <option value="Week 1">Week 1</option>
+              <option value="Week 2">Week 2</option>
+              <option value="Week 3">Week 3</option>
+              <option value="Week 4">Week 4</option>
+            </select>
+          </div>
+          <div class="fg"><div class="fl">Department</div><select class="fs" id="ba-dept" onchange="renderBuyerAction()"><option value="">All Departments</option></select></div>
+          <div class="fg"><div class="fl">Staff</div><select class="fs" id="ba-staff" onchange="renderBuyerAction()"><option value="">All Staff</option></select></div>
+          <button class="rbtn" onclick="resetBuyerAction()"><i class="fa-solid fa-xmark"></i> Reset</button>
+        </div>
+      </div>
 
-<!-- HOME SECTIONS -->
-<div id="homeS">
-  <div class="sec">
-    <div class="sh">
-      <div class="st"><div class="st-bar"></div>Today's Schedule <span class="live-badge">LIVE</span></div>
-      <span id="dateLbl" style="font-size:11px;color:var(--sub)"></span>
+      <div class="kpi-grid" id="kpi-ba"></div>
+
+      <!-- Store Transfer Panel -->
+      <div class="panel" id="panel-transfer" style="display:none;">
+        <div class="panel-head">
+          <div><div class="panel-title"><i class="fa-solid fa-arrow-right-arrow-left" style="color:var(--accent);"></i> Store Transfer</div><div class="panel-title-sub">Items marked for transfer to other stores</div></div>
+          <span class="panel-badge" id="b-transfer">—</span>
+        </div>
+        <div class="tw ts"><table id="t-transfer">
+          <thead><tr><th>Week</th><th>Month</th><th>Article</th><th>Description</th><th>Dept</th><th>Stock</th><th>Expiry</th><th>Transfer To</th><th>Transfer Qty</th><th>Staff</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+
+      <!-- RTC Price Change Panel -->
+      <div class="panel" id="panel-rtc" style="display:none;">
+        <div class="panel-head">
+          <div><div class="panel-title"><i class="fa-solid fa-tag" style="color:var(--red);"></i> RTC Price Change</div><div class="panel-title-sub">Items with Reduced To Clear pricing</div></div>
+          <span class="panel-badge" id="b-rtc">—</span>
+        </div>
+        <div class="tw ts"><table id="t-rtc">
+          <thead><tr><th>Week</th><th>Month</th><th>Article</th><th>Description</th><th>Dept</th><th>Stock</th><th>Expiry</th><th>RTC Price</th><th>Start Date</th><th>End Date</th><th>Staff</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+
+      <!-- Clear In Normal Price Panel -->
+      <div class="panel" id="panel-clear" style="display:none;">
+        <div class="panel-head">
+          <div><div class="panel-title"><i class="fa-solid fa-rotate-left" style="color:var(--green);"></i> Clear In Normal Price</div><div class="panel-title-sub">Clear the items in normal price</div></div>
+          <span class="panel-badge" id="b-clear">—</span>
+        </div>
+        <div class="tw ts"><table id="t-clear">
+          <thead><tr><th>Week</th><th>Month</th><th>Article</th><th>Description</th><th>Dept</th><th>Stock</th><th>Expiry</th><th>Action Date</th><th>Staff</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+
+      <div id="ba-empty" style="text-align:center;padding:40px;color:var(--t3);display:none;">
+          <i class="fa-solid fa-box-open" style="font-size:32px;margin-bottom:10px;"></i>
+          <div style="font-size:14px;font-weight:600;">No Buyer Actions Found</div>
+          <div style="font-size:12px;">There are no buyer actions recorded for the selected Week.</div>
+      </div>
     </div>
-    <div class="match-grid" id="todayGrid">
-      <!-- loaded by JS -->
+
+    <!-- ══ G-LIST ══ -->
+    <div class="page" id="page-glist">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title"><i class="fa-solid fa-table" style="color:var(--accent)"></i> G-List</div>
+            <div class="panel-title-sub">Store Product Collection · Active products scanned from the PDA</div>
+          </div>
+          <div class="glist-meta">
+            <span id="glist-store-label">—</span>
+            <span>•</span>
+            <span id="glist-last-refresh">Not loaded</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid glist-kpi-grid" id="kpi-glist"></div>
+
+      <div class="filter-bar">
+        <div class="filter-bar-row">
+          <div class="fg glist-search">
+            <div class="fl">Search Barcode</div>
+            <input class="form-input" id="glist-search-barcode" type="search"
+                   placeholder="Search barcode..." oninput="renderGList()">
+          </div>
+          <div class="fg" style="min-width:240px;flex:1">
+            <div class="fl">Search Description</div>
+            <input class="form-input" id="glist-search-description" type="search"
+                   placeholder="Search description..." oninput="renderGList()">
+          </div>
+          <div class="fg">
+            <div class="fl">Department</div>
+            <select class="fs" id="glist-dept" onchange="renderGList()">
+              <option value="">All Departments</option>
+            </select>
+          </div>
+          <button class="rbtn" onclick="resetGListFilters()"><i class="fa-solid fa-xmark"></i> Reset</button>
+          <button class="btn" onclick="refreshGList()" id="glist-refresh-btn" style="align-self:flex-end">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Product Collection</div>
+            <div class="panel-title-sub">Excel-style grid · Select rows/cells, drag ranges, resize columns, sort and filter</div>
+          </div>
+          <div class="glist-toolbar">
+            <button class="btn btn-accent" onclick="exportSelectedBarcodes()">
+              <i class="fa-solid fa-file-lines"></i> Export Selected Barcodes
+            </button>
+            <button class="btn btn-green" onclick="exportAllVisibleBarcodes()">
+              <i class="fa-solid fa-download"></i> Export All Visible Barcodes
+            </button>
+            <button class="btn" onclick="copySelectedBarcodes()">
+              <i class="fa-regular fa-copy"></i> Copy Barcodes
+            </button>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:10px;">
+          <div class="glist-grid-wrap">
+            <div id="glist-grid" class="ag-theme-quartz"></div>
+          </div>
+          <div id="glist-empty" class="glist-empty" style="display:none;">
+            <i class="fa-solid fa-box-open"></i>
+            <div style="font-size:14px;font-weight:600;">No Active Products Found</div>
+            <div style="font-size:12px;margin-top:4px;">No records currently exist for this store.</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="sec">
-    <div class="sh"><div class="st"><div class="st-bar"></div>🏏 Cricket <span style="color:var(--sub);font-weight:400;font-size:14px">Matches</span></div></div>
-    <div class="hrow" id="cricketRow"></div>
-  </div>
-
-  <div class="sec">
-    <div class="sh"><div class="st"><div class="st-bar"></div>⚽ Football <span style="color:var(--sub);font-weight:400;font-size:14px">Matches</span></div></div>
-    <div class="hrow" id="footballRow"></div>
-  </div>
-
-  <div class="sec">
-    <div class="sh"><div class="st"><div class="st-bar"></div>📺 Popular <span style="color:var(--sub);font-weight:400;font-size:14px">Channels</span></div>
-    <span class="chip" style="cursor:pointer;font-size:10px" onclick="navTo('channels',document.getElementById('ntChannels'))">All Channels →</span>
+    <!-- ══ MANAGE STAFF ══ -->
+    <div class="page" id="page-staff">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title"><i class="fa-solid fa-users"></i> Manage Store Staff</div><div class="panel-title-sub">Add or remove staff members who submit expiry records</div></div>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="text" id="staff-input" class="form-input" placeholder="Enter staff name..." style="flex:1;" onkeydown="if(event.key==='Enter')addStaff()">
+            <button class="btn btn-accent" onclick="addStaff()"><i class="fa-solid fa-plus"></i> Add Staff</button>
+          </div>
+          <div id="staff-list"></div>
+        </div>
+      </div>
     </div>
-    <div class="ch-grid" id="popularChGrid"></div>
-  </div>
-</div>
 
-<!-- FILTERED GRID -->
-<div id="gridS" style="display:none">
-  <div class="sec">
-    <div class="sh"><div class="st" id="gridTitle"><div class="st-bar"></div>Matches</div><span id="gridCnt" style="font-size:11px;color:var(--sub)"></span></div>
-    <div class="match-grid" id="mainGrid"></div>
-  </div>
-</div>
-
-<!-- SEARCH -->
-<div id="searchS" style="display:none">
-  <div class="sec">
-    <div class="sh"><div class="st"><div class="st-bar"></div>Search Results</div><span id="sCnt" style="font-size:11px;color:var(--sub)"></span></div>
-    <div class="match-grid" id="searchGrid"></div>
-  </div>
-</div>
-
-<!-- CHANNELS PAGE -->
-<div id="channelS" style="display:none">
-  <div class="sec">
-    <div class="sh"><div class="st"><div class="st-bar"></div>📺 All Channels</div><span id="chCnt" style="font-size:11px;color:var(--sub)"></span></div>
-    <div class="ch-grid" id="allChGrid"></div>
-  </div>
-</div>
-
-<footer>© 2026 KickOff Live · Powered by DaddyLive streams · All streams © respective broadcasters</footer>
-
-<!-- PLAYER MODAL -->
-<div id="pm">
-  <div class="pmtop">
-    <button class="pmclose" onclick="closePlayer()">✕</button>
-    <div class="pmtitle" id="pmtitle">Loading...</div>
-    <div class="pmctrls">
-      <button class="pmbtn" onclick="goFS()">⛶ FS</button>
-      <button class="extbtn" onclick="openExt()">📱 External</button>
+    <!-- ══ HISTORY ══ -->
+    <div class="page" id="page-history">
+      <div class="filter-bar">
+        <div class="filter-bar-row">
+          <div class="fg"><div class="fl">Month</div><select class="fs" id="hist-ym" onchange="renderHistory()"><option value="">All Months</option></select></div>
+          <div class="fg"><div class="fl">Week</div><select class="fs" id="hist-week" onchange="renderHistory()"><option value="">All Weeks</option></select></div>
+          <div class="fg"><div class="fl">Department</div><select class="fs" id="hist-dept" onchange="renderHistory()"><option value="">All Departments</option></select></div>
+          <div class="fg"><div class="fl">Staff</div><select class="fs" id="hist-staff" onchange="renderHistory()"><option value="">All Staff</option></select></div>
+          <button class="rbtn" onclick="resetHist()"><i class="fa-solid fa-xmark"></i> Reset</button>
+          <button class="btn btn-green" onclick="exportHistXL()" style="align-self:flex-end"><i class="fa-solid fa-file-excel"></i> Export To Excel</button>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpi-hist"></div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Week-over-Week Stock</div><span class="panel-badge" id="hist-wk-badge">—</span></div>
+        <div class="panel-body"><div class="wk-grid" id="hist-wk"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">All History — This Store</div><div class="panel-title-sub">Complete expiry submission history</div></div>
+          <span class="panel-badge" id="b-hist">—</span>
+        </div>
+        <div class="tw ts"><table id="t-hist">
+          <thead><tr><th>Timestamp</th><th>Week</th><th>Month</th><th>Article</th><th>Description</th><th>Dept</th><th>Stock</th><th>Expiry</th><th>Days Left</th><th>Risk</th><th>Staff</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
     </div>
-  </div>
-  <div class="srvrow" id="srvrow"></div>
-  <div class="pframe" id="pframe">
-    <div class="pload" id="pload">
-      <div class="spin"></div>
-      <p>Connecting to stream...</p>
-    </div>
-    <iframe id="pif" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="no-referrer"></iframe>
-    <video id="pvid" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;display:none;background:#000"></video>
+
   </div>
 </div>
-
-<!-- EXT PLAYER SHEET -->
-<div id="eps" onclick="if(event.target===this)closeExt()">
-  <div class="epbox">
-    <div class="eph">📱 Open In External Player</div>
-    <p class="epdesc">Stream opens in your chosen app — must be installed</p>
-    <div class="epbtns" id="epbtns"></div>
-    <button class="epcancel" onclick="closeExt()">Cancel</button>
-  </div>
+</div>
 </div>
 
-<div id="toast"></div>
+<div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 <script>
-// ═══════════════════════════════════════════
-// DATA SOURCES
-// Primary: IPTV-Scraper-Zilla M3U (20k+ channels, updated daily, no CORS issue via raw.githubusercontent.com)
-// Schedule: TheSportsDB (cricket/football fixtures, CORS open)
-// ═══════════════════════════════════════════
+const API = "https://exp.galamarkets.workers.dev";
+// G-List reads SharePoint directly from the browser. No Cloudflare Worker/API is used for this page.
+// ── SHAREPOINT G-LIST SESSION ──
+// Same SharePoint sharing link used by the Android PDA app.
+// The browser first opens this URL to establish the SharePoint session,
+// then uses the resulting session for the REST API request.
+const MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 
-const M3U_URL = 'https://raw.githubusercontent.com/abusaeeidx/IPTV-Scraper-Zilla/main/combined-playlist.m3u';
-const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
+let storeCode='', storeName='', storeData=[], storeStaffs=[];
+let editCurrentRow=null, deleteRowIndex=null, reviewRows=[];
+let glistRows=[], glistGridApi=null, glistRefreshTimer=null;
 
-// Sport classification keywords
-const SPORT_MAP = {
-  cricket: ['cricket','star sport','willow','ptv sport','a sport','ten sport','ten cricket','t sport','dd sport','astro cricket','fox cricket','sky sport cricket','sky sports cricket','ipl 2026','crichd','geo super','star gold','cricket gold'],
-  football: ['premier league','la liga','laliga','bundesliga','serie a','champions league','mls','europa','sky sports football','sky sports premier','bt sport','tnt sport','beIN sports','bein sport','espn','goal tv','super football','bleav football','nbc sports','nfl','sky sports f1'],
-  motorsport: ['f1','formula','nascar','motorsport','sky sports f1','motor'],
-  tennis: ['tennis','sky sports tennis','wimbledon'],
-  basketball: ['nba','basketball'],
-  mma: ['ufc','boxing','mma','fight'],
+// ── TOAST ──
+function toast(msg,type='',ms=2600){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+(type||'');
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),ms);
+}
+
+// ── LOGIN ──
+async function doLogin(){
+  const code=(document.getElementById('login-code').value||'').trim().toUpperCase();
+  const pass=(document.getElementById('login-pass').value||'').trim();
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  const spinner=document.getElementById('login-spinner');
+  const remember = document.getElementById('remember-me').checked;
+  
+  errEl.style.display='none';
+  if(!code||!pass){errEl.textContent='Please enter Store Code and password.';errEl.style.display='block';return;}
+  btn.disabled=true; spinner.style.display='block';
+  try{
+    const r = await fetch(API+'?action=storeAuth', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ storeCode: code, password: pass })
+    });
+    const res = await r.json();
+
+    if (!r.ok || !res.success) {
+      errEl.textContent = res.message || 'Login failed.';
+      errEl.style.display = 'block';
+      return;
+    }
+    
+    // Store password in session storage so we can use it for future API calls in this session
+    sessionStorage.setItem('pass', pass);
+
+    if(remember){
+      localStorage.setItem('gala_saved_sc', code);
+      localStorage.setItem('gala_saved_pass', pass);
+    } else {
+      localStorage.removeItem('gala_saved_sc');
+      localStorage.removeItem('gala_saved_pass');
+    }
+
+    storeCode = String(res.storeCode || '').trim();
+    storeName = String(res.storeName || '').trim();
+    const staffsStr = String(res.staffs || "").trim();
+    storeStaffs = staffsStr ? staffsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    sessionStorage.setItem('sc',storeCode); 
+    sessionStorage.setItem('sn',storeName);
+    sessionStorage.setItem('ss',JSON.stringify(storeStaffs));
+    
+    startApp();
+  }catch(e){errEl.textContent='Connection error. Please try again.';errEl.style.display='block';}
+  finally{btn.disabled=false;spinner.style.display='none';}
+}
+
+function logout(){
+  sessionStorage.removeItem('sc'); sessionStorage.removeItem('sn'); sessionStorage.removeItem('ss'); sessionStorage.removeItem('pass');
+  stopGListAutoRefresh();
+  storeCode=''; storeName=''; storeData=[]; storeStaffs=[]; glistRows=[];
+  if(glistGridApi){glistGridApi.destroy(); glistGridApi=null;}
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('app-page').style.display='none';
+  if(!document.getElementById('remember-me').checked) {
+    document.getElementById('login-code').value='';
+    document.getElementById('login-pass').value='';
+  }
+}
+
+function startApp(){
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app-page').style.display='block';
+  document.getElementById('sb-store-label').textContent=storeCode+' · '+storeName;
+  document.getElementById('ptitle-sub').textContent=storeName+' ('+storeCode+')';
+  go('dashboard'); loadData();
+  startGListAutoRefresh();
+  
+  makeTableResizable('t-expired');
+  makeTableResizable('t-exp7');
+}
+
+window.onload=()=>{
+  const sc=sessionStorage.getItem('sc'),sn=sessionStorage.getItem('sn'),ss=sessionStorage.getItem('ss');
+  if(sc&&sn){storeCode=sc;storeName=sn; if(ss) storeStaffs=JSON.parse(ss); startApp();}
+  
+  const savedSc = localStorage.getItem('gala_saved_sc');
+  const savedPass = localStorage.getItem('gala_saved_pass');
+  if(savedSc && savedPass) {
+    document.getElementById('login-code').value = savedSc;
+    document.getElementById('login-pass').value = savedPass;
+    document.getElementById('remember-me').checked = true;
+  }
 };
 
-function detectSportFromName(name){
-  const n = name.toLowerCase();
-  for(const [sport, keys] of Object.entries(SPORT_MAP)){
-    if(keys.some(k=>n.includes(k))) return sport;
+// ── NAV ──
+const TITLES={dashboard:'Overview',review:'Review / This Week',buyerAction:"Buyer's Action",history:'History',glist:'G-List',staff:'Manage Staff'};
+function go(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  document.getElementById('n-'+n).classList.add('active');
+  document.getElementById('ptitle').textContent=TITLES[n];
+  if(n==='glist') { if(glistRows.length===0) loadGListData(); else renderPage(n); return; }
+  if(storeData.length>0 || n==='staff') renderPage(n);
+}
+function renderPage(n){({dashboard:renderDashboard,review:renderReview,buyerAction:renderBuyerAction,history:renderHistory,glist:renderGList,staff:renderStaffPage})[n]?.();}
+
+// ── LOAD DATA ──
+async function loadData(){
+  const btn=document.getElementById('rfbtn'); 
+  if(btn) btn.classList.add('loading');
+  setStatus('loading','Loading store data…');
+  try{
+    const pass = sessionStorage.getItem('pass') || localStorage.getItem('gala_saved_pass') || '';
+    const dataR = await fetch(API+'?action=thisStoreData&storeCode='+encodeURIComponent(storeCode)+'&password='+encodeURIComponent(pass)+'&_t='+Date.now()).then(r=>r.json());
+    storeData=processStoreData(dataR.rows||[]);
+    setStatus('ok',`<strong>${storeData.length}</strong> items for ${storeName}`);
+    updateBuyerActionBadge();
+    populateAllFilters();
+    renderPage(document.querySelector('.nav-item.active')?.id?.replace('n-','')||'dashboard');
+  }catch(e){setStatus('err','❌ '+e.message);}
+  if(btn) btn.classList.remove('loading');
+}
+
+function setStatus(s,m){document.getElementById('sdot').className='sdot '+s;document.getElementById('sinfo').innerHTML=m;}
+
+function cleanWeek(weekStr) {
+  if (!weekStr) return '';
+  const s = String(weekStr).trim();
+  const m = s.match(/Week\s*(\d+)/i);
+  if (m) {
+    return `Week ${m[1]}`;
   }
-  if(n.includes('sport')) return 'all';
+  return s;
+}
+
+function updateBuyerActionBadge() {
+  const actionedCount = storeData.filter(r => r.ActionTaken && r.ActionTaken.trim() !== '').length;
+  const badge = document.getElementById('nb-buyerAction');
+  if (badge) {
+    if (actionedCount > 0) {
+      badge.textContent = actionedCount;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+}
+
+function processStoreData(rows){
+  return rows.map((r,i)=>{
+    const expDate=parseDate(r.ExpiryDate);
+    let daysLeft=null;
+    if(r.DaysLeft!==undefined&&r.DaysLeft!==''){const p=parseInt(r.DaysLeft,10);if(!isNaN(p))daysLeft=p;}
+    if(daysLeft===null&&expDate)daysLeft=Math.round((expDate-TODAY)/86400000);
+    let subMonth=r.SubMonth||'';
+    if(!subMonth&&r.Timestamp)subMonth=String(r.Timestamp).slice(0,7);
+    let subMonthDisp='';
+    if(subMonth){const mm=subMonth.match(/^(\d{4})-(\d{2})$/);if(mm)subMonthDisp=MS[+mm[2]-1]+' '+mm[1];}
+    return{
+      _idx:i, RowIndex:r.RowIndex,
+      Timestamp:r.Timestamp||'', Week:cleanWeek(r.Week), Article:r.Article||'',
+      Barcode:r.Barcode||'', Description:r.Description||'', Department:r.Department||'',
+      Stock:r.Stock||'', ExpiryDate:r.ExpiryDate||'', DaysLeft:daysLeft,
+      Bucket:calcBucket(daysLeft), SubMonth:subMonth, SubMonthDisp:subMonthDisp,
+      StaffName: r.StaffName || r.staffName || '',
+      ActionTaken: r.ActionTaken || r.actionTaken || '',
+      RtcPrice: r.RtcPrice || r.rtcPrice || '',
+      TransferTo: r.TransferTo || r.transferTo || '',
+      TransferQty: r.TransferQty || r.transferQty || '',
+      Start: r.Start || r.startDate || '',
+      End: r.End || r.endDate || '',
+      ActionDate: r.ActionDate || r.actionDate || ''
+    };
+  });
+}
+
+const MMAP={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseDate(v){
+  if(!v)return null; v=String(v).trim(); if(!v)return null;
+  let m=v.match(/(?:[A-Za-z]{3,}\s+)?([A-Za-z]{3,})\s+(\d{1,2})\s+(\d{4})/);
+  if(m){const mo=MMAP[m[1].toLowerCase().slice(0,3)];if(mo!==undefined)return new Date(+m[3],mo,+m[2]);}
+  m=v.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  m=v.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const clean=v.replace(/[\u0600-\u06FF\u200F\u200E\u202A-\u202E()]/g,'').replace(/GMT[+-]\d{4}/gi,'').replace(/\s+/g,' ').trim();
+  if(clean){const fd=new Date(clean);if(!isNaN(fd))return new Date(fd.getFullYear(),fd.getMonth(),fd.getDate());}
   return null;
 }
-
-// Parse M3U text into channel objects
-function parseM3U(text){
-  const lines = text.split('\n');
-  const channels = [];
-  let i = 0;
-  while(i < lines.length){
-    const line = lines[i].trim();
-    if(line.startsWith('#EXTINF')){
-      const nameMatch = line.match(/,(.+)$/);
-      const logoMatch = line.match(/tvg-logo="([^"]*)"/);
-      const groupMatch = line.match(/group-title="([^"]*)"/);
-      const name = nameMatch ? nameMatch[1].trim().replace(/^\[BD\]\s*/,'') : '';
-      const logo = logoMatch ? logoMatch[1] : '';
-      const group = groupMatch ? groupMatch[1] : '';
-      const url = (lines[i+1]||'').trim();
-      if(url && !url.startsWith('#') && name && url.startsWith('http')){
-        // Skip broken logo URLs (some BD entries have malformed names)
-        const cleanName = (name.replace(/^[^,\]]+\],?\s*/,'').trim() || name).replace(/[`'"\\]/g,'');
-        // Skip known-dead sources
-        const skipHosts = ['zohanayaan.com','bldcmprod-cdn','toffeelive.com','tvsen5.aynaott','tvsen6.aynaott','tvsen7.aynaott','redbooks.site','roarzone.net'];
-        if(skipHosts.some(h=>url.includes(h))) { i++; continue; }
-        channels.push({name: cleanName, logo, group, url});
-      }
-    }
-    i++;
-  }
-  return channels;
+function calcBucket(days){
+  if(days===null||days===''||isNaN(Number(days)))return'';
+  days=Number(days);
+  if(days<=0)return'Expired';if(days<=7)return'<7 Days';if(days<=30)return'7–30 Days';if(days<=60)return'31–60 Days';if(days<=90)return'61–90 Days';return'>90 Days';
+}
+function bktCls(b){if(!b)return'na';if(b==='<7 Days'||b==='Expired')return'crit';if(b==='7–30 Days')return'high';if(b==='31–60 Days')return'med';return'low';}
+function fmtDate(v){if(!v)return'—';const d=parseDate(v);return d?String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear():v;}
+function daysColor(d){if(d===null)return'var(--t3)';if(d<=7)return'var(--red)';if(d<=30)return'var(--orange)';if(d<=60)return'var(--yellow)';return'var(--green)';}
+function KPI(label,cls,val,sub=''){return`<div class="kpi ${cls}"><div class="kpi-label">${label}</div><div class="kpi-value">${typeof val==='number'?val.toLocaleString():val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;}
+function gv(id){const el=document.getElementById(id);return el?el.value:'';}
+function currentYM(){
+  const n=new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+function getCurrentWeekStr() {
+  const day = new Date().getDate();
+  if (day <= 7) return 'Week 1';
+  if (day <= 14) return 'Week 2';
+  if (day <= 21) return 'Week 3';
+  return 'Week 4';
 }
 
-// Convert M3U channel to event-like format for the match card renderer
-// Groups channels by sport into "events" (one event = one channel = click to play)
-function m3uToEvents(channels){
-  const seen = new Set();
-  const events = [];
-  for(const ch of channels){
-    const sport = detectSportFromName(ch.name);
-    if(!sport) continue;
-    const key = ch.name.toLowerCase().trim();
-    if(seen.has(key)) continue;
-    seen.add(key);
-    events.push({
-      time: '',
-      event: ch.name.replace(/[`'"\\]/g,''),
-      sport,
-      category: ch.group || sport,
-      _league: ch.group || '',
-      _logo: ch.logo,
-      _hlsUrl: ch.url,  // direct HLS stream URL
-      channels: [{channel_id: '_hls', channel_name: ch.name, _hlsUrl: ch.url}],
-      channels2: [],
-    });
-  }
-  return events;
+// Helper to filter by week string safely
+function filterByWeek(d, weekVal) {
+  if (!weekVal) return d;
+  return d.filter(r => r.Week === weekVal);
 }
 
-// ═══════════════════════════════════════════
-// HARDCODED POPULAR SPORTS CHANNELS (DaddyLive IDs)
-// ═══════════════════════════════════════════
-const POPULAR_CHANNELS = [
-  {id:'65',  name:'Sky Sports Cricket',   sport:'cricket',    ico:'🏏'},
-  {id:'346', name:'Willow Cricket',        sport:'cricket',    ico:'🏏'},
-  {id:'368', name:'SuperSport Cricket',    sport:'cricket',    ico:'🏏'},
-  {id:'598', name:'Willow Xtra',           sport:'cricket',    ico:'🏏'},
-  {id:'72',  name:'Star Sports 1',         sport:'cricket',    ico:'🏏'},
-  {id:'548', name:'A Sports HD',           sport:'cricket',    ico:'🏏'},
-  {id:'66',  name:'Sky Sports Football',   sport:'football',   ico:'⚽'},
-  {id:'77',  name:'beIN Sports 1',         sport:'football',   ico:'⚽'},
-  {id:'78',  name:'beIN Sports 2',         sport:'football',   ico:'⚽'},
-  {id:'1',   name:'ESPN',                  sport:'football',   ico:'⚽'},
-  {id:'302', name:'Sky Sports Main Event', sport:'football',   ico:'⚽'},
-  {id:'55',  name:'TNT Sports 1',          sport:'football',   ico:'⚽'},
-  {id:'56',  name:'TNT Sports 2',          sport:'football',   ico:'⚽'},
-  {id:'57',  name:'TNT Sports 3',          sport:'football',   ico:'⚽'},
-  {id:'6',   name:'Fox Sports 1',          sport:'all',        ico:'📺'},
-  {id:'7',   name:'Fox Sports 2',          sport:'all',        ico:'📺'},
-  {id:'51',  name:'NBA TV',                sport:'basketball', ico:'🏀'},
-  {id:'100', name:'Eurosport 1',           sport:'all',        ico:'📺'},
-  {id:'101', name:'Eurosport 2',           sport:'all',        ico:'📺'},
-  {id:'67',  name:'Sky Sports Golf',       sport:'golf',       ico:'⛳'},
-  {id:'20',  name:'Sky Sports Tennis',     sport:'tennis',     ico:'🎾'},
-  {id:'8',   name:'ESPN 2',                sport:'all',        ico:'📺'},
-  {id:'200', name:'beIN Sports 3',         sport:'football',   ico:'⚽'},
-  {id:'201', name:'beIN Sports 4',         sport:'football',   ico:'⚽'},
+// ── POPULATE ALL FILTERS ──
+function populateAllFilters(){
+  const months=[...new Set(storeData.map(r=>r.SubMonth).filter(Boolean))].sort();
+  const weeks=[...new Set(storeData.map(r=>r.Week).filter(Boolean))].sort();
+  const depts=[...new Set(storeData.map(r=>r.Department).filter(Boolean))].sort();
+  const mOpts=months.map(ym=>{const m=ym.match(/^(\d{4})-(\d{2})$/);return m?{val:ym,lbl:MS[+m[2]-1]+' '+m[1]}:{val:ym,lbl:ym};});
+  const staffOpts = storeStaffs.map(s => ({val: s, lbl: s}));
+
+  fillOpts('dash-ym', mOpts); fillVals('dash-dept', depts); fillOpts('dash-staff', staffOpts);
+  
+  fillOpts('rev-ym', mOpts);
+  fillVals('rev-dept', depts);
+  fillOpts('rev-staff', staffOpts);
+  document.getElementById('rev-ym').value = currentYM();
+  document.getElementById('rev-week').value = getCurrentWeekStr();
+  
+  fillOpts('ba-ym', mOpts);
+  fillVals('ba-dept', depts);
+  fillOpts('ba-staff', staffOpts);
+  document.getElementById('ba-ym').value = currentYM();
+  document.getElementById('ba-week').value = getCurrentWeekStr();
+
+  fillOpts('hist-ym', mOpts); fillVals('hist-week', weeks); fillVals('hist-dept', depts); fillOpts('hist-staff', staffOpts);
+}
+
+function fillVals(id,vals){
+  const el=document.getElementById(id); if(!el)return;
+  const cur=el.value; el.innerHTML='<option value="">All</option>';
+  vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});
+  if(vals.includes(cur))el.value=cur;
+}
+function fillOpts(id,opts){
+  const el=document.getElementById(id); if(!el)return;
+  const cur=el.value; el.innerHTML='<option value="">All</option>';
+  opts.forEach(({val,lbl})=>{const o=document.createElement('option');o.value=val;o.textContent=lbl;el.appendChild(o);});
+  if(opts.some(o=>o.val===cur))el.value=cur;
+}
+
+
+// ── G-LIST ──
+const GLIST_COLUMNS = [
+  { field:'Article', headerName:'Article', minWidth:115, width:125 },
+  { field:'Barcode', headerName:'Barcode', minWidth:145, width:155, cellClass:'glist-mono' },
+  { field:'Description', headerName:'Description', minWidth:280, flex:2 },
+  { field:'Department', headerName:'Department', minWidth:150, width:170 },
+  { field:'CreatedOn', headerName:'Created On', minWidth:165, width:175, sort:'desc',
+    comparator:(a,b)=>{ const da=glistDate(a)?.getTime()||0; const db=glistDate(b)?.getTime()||0; return da-db; } }
 ];
 
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let scheduleData = {};
-let allEvents = [];
-let curFilter = 'all';
-let curCh = null;
-let curFolder = 0;
-let curStreamUrl = '';
-const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-// ═══════════════════════════════════════════
-// SCHEDULE FETCH
-// ═══════════════════════════════════════════
-async function tryFetch(url, timeout=8000){
-  const r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
-  if(!r.ok) throw new Error('HTTP ' + r.status);
-  return r;
+function glistNormalizeRows(rows){
+  return (Array.isArray(rows) ? rows : []).map((r,i)=>{
+    const store=String(r.StoreCode ?? '').trim();
+    const article=String(r.Article ?? '').trim();
+    const barcode=String(r.Barcode ?? '').trim();
+    const description=String(r.Description ?? '').trim();
+    const department=String(r.Department ?? '').trim();
+    const status=String(r.Status ?? '').trim();
+    const created =
+  r.CreatedOn ||
+  r.Created ||
+  '';
+    return {
+      _gidx:i,
+      _gkey:[store,article,barcode,created].join('|'),
+      StoreCode:store,
+      Article:article,
+      Barcode:barcode,
+      Description:description,
+      Department:department,
+      Status:status,
+      CreatedOn:created
+    };
+  }).filter(r =>
+    r.StoreCode === String(storeCode).trim() &&
+    r.Status.toLowerCase() === 'active'
+  );
 }
 
-async function fetchSchedule(){
-  // 1. Load M3U playlist (raw.githubusercontent.com is CORS-open, works everywhere)
-  let m3uEvents = [];
-  try{
-    setSrcBanner('warn','⏳ Loading channel list...');
-    const r = await tryFetch(M3U_URL, 12000);
-    const text = await r.text();
-    const channels = parseM3U(text);
-    m3uEvents = m3uToEvents(channels);
-    setSrcBanner('ok', `✅ ${m3uEvents.length} sports channels loaded`);
-    console.log('M3U channels loaded:', m3uEvents.length);
-  }catch(e){
-    console.warn('M3U fetch fail:', e.message);
-    setSrcBanner('err','✗ Channel list failed — trying fallback');
-  }
-
-  return m3uEvents.length ? m3uEvents : null;
+function glistDate(v){
+  if(!v) return null;
+  const d = new Date(v);
+  if(!isNaN(d)) return d;
+  const p = parseDate(v);
+  return p || null;
 }
 
-
-function flatBucket(b){
-  return [...b.football,...b.cricket,...b.tennis,...b.basketball,...b.mma,...b.motorsport,...b.other];
+function getGListSelectionKeys(){
+  if(!glistGridApi) return new Set();
+  return new Set(glistGridApi.getSelectedNodes().map(n=>n.data?._gkey).filter(Boolean));
 }
 
-function isLive(timeStr){
-  if(!timeStr) return false;
-  try{
-    const now = new Date();
-    const [h,m] = timeStr.split(':').map(Number);
-    const t = new Date(); t.setHours(h,m,0,0);
-    const diff = (now - t) / 60000;
-    return diff >= 0 && diff < 180;
-  }catch{ return false; }
-}
-
-function detectSport(cat, title){
-  const s = (cat+' '+title).toLowerCase();
-  if(s.includes('cricket')) return 'cricket';
-  if(s.includes('football')||s.includes('soccer')||s.includes('premier league')||s.includes('laliga')||s.includes('bundesliga')||s.includes('serie a')||s.includes('ligue')||s.includes('champions')||s.includes('mls')) return 'football';
-  if(s.includes('tennis')) return 'tennis';
-  if(s.includes('basketball')||s.includes('nba')) return 'basketball';
-  if(s.includes('mma')||s.includes('ufc')||s.includes('boxing')) return 'mma';
-  if(s.includes('motorsport')||s.includes('formula')||s.includes('nascar')||s.includes('f1')) return 'motorsport';
-  if(s.includes('golf')) return 'golf';
-  return 'all';
-}
-
-function parseSchedule(data){
-  if(!data) return [];
-  const events = [];
-  Object.entries(data).forEach(([dayKey, cats])=>{
-    if(typeof cats !== 'object') return;
-    Object.entries(cats).forEach(([cat, matches])=>{
-      if(!Array.isArray(matches)) return;
-      matches.forEach(m=>{
-        events.push({
-          time: m.time||'',
-          event: m.event||m.title||'—',
-          category: cat,
-          sport: detectSport(cat, m.event||''),
-          channels: m.channels||[],
-          channels2: m.channels2||[],
-          day: dayKey,
-        });
-      });
-    });
+function restoreGListSelection(keys){
+  if(!glistGridApi || !keys?.size) return;
+  glistGridApi.forEachNode(n=>{
+    if(n.data && keys.has(n.data._gkey)) n.setSelected(true);
   });
-  return events;
 }
 
+function buildGListGrid(){
+  const el=document.getElementById('glist-grid');
+  if(!el || typeof agGrid==='undefined') return;
 
-// ═══════════════════════════════════════════
-// RENDER MATCH CARD
-// ═══════════════════════════════════════════
-function mkMatch(ev){
-  const live = isLive(ev.time);
-  const sportIco = {cricket:'🏏',football:'⚽',tennis:'🎾',basketball:'🏀',mma:'🥊',motorsport:'🏎️',golf:'⛳',all:'📺'}[ev.sport]||'📺';
-  const allChs = [...ev.channels, ...(ev.channels2||[])].slice(0,4);
+  if(glistGridApi) return;
 
-  const chHtml = ev._noStream
-    ? `<span style="font-size:10px;color:var(--org)">📅 Schedule only &mdash; no stream</span>`
-    : allChs.map(ch=>`
-    <div class="mc-ch" onclick="event.stopPropagation();playChannel('${ch.channel_id}','${(ch.channel_name||'').replace(/'/g,"\\'")}','${(ev.event||'').replace(/'/g,"\\'")}')">
-      <span>${ch.channel_name||'Stream'}</span>
-    </div>`).join('');
+  const options={
+    rowData:[],
+    columnDefs:GLIST_COLUMNS,
+    defaultColDef:{
+      sortable:true,
+      filter:true,
+      resizable:true,
+      floatingFilter:true,
+      wrapText:false
+    },
+    rowSelection:{
+      mode:'multiRow',
+      checkboxes:true,
+      headerCheckbox:true,
+      enableClickSelection:true
+    },
+    cellSelection:true,
+    enableCellTextSelection:true,
+    animateRows:false,
+    pagination:false,
+    rowBuffer:20,
+    suppressColumnVirtualisation:false,
+    tooltipShowDelay:400,
+    getRowId:p=>String(p.data._gkey || p.data._gidx),
+    onGridReady:p=>{
+      glistGridApi=p.api;
+      updateGListKpis();
+    },
+    onFilterChanged:updateGListKpis,
+    onRowSelected:updateGListKpis
+  };
 
-  return `<div class="mcard" onclick="playBestChannel(${JSON.stringify(ev).replace(/"/g,'&quot;')})">
-    <div class="mc-sport">
-      <span class="mc-sport-tag">${sportIco} ${ev.category||ev.sport}</span>
-      ${live
-        ? `<span class="mc-live-now"><span class="live-dot"></span>LIVE</span>`
-        : `<span class="mc-time">${ev.time||'Today'}</span>`}
-    </div>
-    <div class="mc-event">${ev.event}</div>
-    <div class="mc-channels">${chHtml||`<span style="font-size:10px;color:var(--sub)">No streams</span>`}</div>
-  </div>`;
+  glistGridApi=agGrid.createGrid(el,options);
 }
 
-function playBestChannel(ev){
-  const chs = [...(ev.channels||[]), ...(ev.channels2||[])];
-  if(!chs.length){ toast('No streams available'); return; }
-  playChannel(chs[0].channel_id, chs[0].channel_name||'Stream', ev.event||'Match', chs);
-}
+function updateGListKpis(){
+  const api=glistGridApi;
+  const visible=[];
+  if(api) api.forEachNodeAfterFilterAndSort(n=>visible.push(n.data));
 
-// ═══════════════════════════════════════════
-// RENDER CHANNEL CARD
-// ═══════════════════════════════════════════
-function mkChannel(ch){
-  const logoUrl = ch.logo_url
-    ? (ch.logo_url.startsWith('http') ? ch.logo_url : `${activeMirror.base}/${ch.logo_url}`)
-    : '';
-  return `<div class="chcard" onclick="playChannel('${ch.id}','${(ch.name||'').replace(/'/g,"\\'")}','${ch.name||''}', [{channel_id:'${ch.id}',channel_name:'${ch.name}'}])">
-    ${logoUrl
-      ? `<img class="chcard-logo" src="${logoUrl}" alt="${ch.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div style="display:none;font-size:22px">${ch.ico||'📺'}</div>`
-      : `<div style="font-size:22px">${ch.ico||'📺'}</div>`}
-    <div class="chcard-name">${ch.name}</div>
-    <div class="chcard-live">● LIVE</div>
-  </div>`;
-}
+  const depts=new Set(visible.map(r=>r.Department).filter(Boolean));
+  const last=visible.map(r=>glistDate(r.CreatedOn)).filter(Boolean).sort((a,b)=>b-a)[0];
 
-// ═══════════════════════════════════════════
-// SKELETONS
-// ═══════════════════════════════════════════
-function matchSkels(n=6){
-  return Array(n).fill(`<div class="skel" style="height:120px"></div>`).join('');
-}
-
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
-async function init(){
-  // Show date
-  const now = new Date();
-  document.getElementById('dateLbl').textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-
-  // Show skeleton
-  document.getElementById('todayGrid').innerHTML = matchSkels(6);
-  document.getElementById('cricketRow').innerHTML = '<div class="skel" style="height:120px;min-width:260px"></div>'.repeat(4);
-  document.getElementById('footballRow').innerHTML = '<div class="skel" style="height:120px;min-width:260px"></div>'.repeat(4);
-
-  // Popular channels immediately
-  document.getElementById('popularChGrid').innerHTML = POPULAR_CHANNELS.slice(0,12).map(mkChannel).join('');
-  document.getElementById('allChGrid').innerHTML = POPULAR_CHANNELS.map(mkChannel).join('');
-  document.getElementById('chCnt').textContent = POPULAR_CHANNELS.length + ' channels';
-
-  // Fetch schedule — returns flat array (new APIs) or null
-  setSrcBanner('warn','⏳ Connecting to stream sources...');
-  const data = await fetchSchedule();
-  if(data && Array.isArray(data) && data.length){
-    allEvents = data;
-    // banner already set inside fetchSchedule
-  } else {
-    setSrcBanner('err','✗ No live schedule — UAE may block stream sites · Showing channels only');
-    allEvents = POPULAR_CHANNELS.map(ch=>({
-      time:'', event:ch.name, sport:ch.sport, category:ch.sport,
-      channels:[{channel_id:ch.id, channel_name:ch.name}], channels2:[],
-    }));
+  const k=document.getElementById('kpi-glist');
+  if(k){
+    k.innerHTML=
+      KPI('Total Records','neu',visible.length)+
+      KPI('Total Barcodes','acc',new Set(visible.map(r=>r.Barcode).filter(Boolean)).size)+
+      KPI('Departments','blu',depts.size)+
+      KPI('Last Updated','grn',last?last.toLocaleDateString('en-GB'):'—');
   }
-
-  // Update stat
-  document.getElementById('statEvents').textContent = allEvents.length || POPULAR_CHANNELS.length;
-
-  // Render
-  renderToday(allEvents);
-  renderRow('cricketRow', allEvents.filter(e=>e.sport==='cricket'), 8);
-  renderRow('footballRow', allEvents.filter(e=>e.sport==='football'), 8);
 }
 
-function renderToday(events){
-  const el = document.getElementById('todayGrid');
-  const filtered = curFilter==='all' ? events : events.filter(e=>e.sport===curFilter);
-  if(!filtered.length){
-    el.innerHTML = `<div class="empty"><span class="empty-ico">📡</span>No matches scheduled right now — check back soon or browse channels</div>`;
-    return;
-  }
-  el.innerHTML = filtered.slice(0,24).map(mkMatch).join('');
+function renderGList(){
+  if(!glistGridApi) buildGListGrid();
+  const api=glistGridApi;
+  if(!api) return;
+
+  const selectedKeys=getGListSelectionKeys();
+  const barcode=(document.getElementById('glist-search-barcode')?.value||'').trim().toLowerCase();
+  const desc=(document.getElementById('glist-search-description')?.value||'').trim().toLowerCase();
+  const dept=document.getElementById('glist-dept')?.value||'';
+
+  // Second-layer guard: only the logged-in store + Active rows can enter the grid.
+  const filtered=glistRows.filter(r=>{
+    if(String(r.StoreCode)!==String(storeCode)) return false;
+    if(String(r.Status).toLowerCase()!=='active') return false;
+    if(barcode && !r.Barcode.toLowerCase().includes(barcode)) return false;
+    if(desc && !r.Description.toLowerCase().includes(desc)) return false;
+    if(dept && r.Department!==dept) return false;
+    return true;
+  });
+
+  api.setGridOption('rowData',filtered);
+  setTimeout(()=>restoreGListSelection(selectedKeys),0);
+  updateGListKpis();
+
+  const empty=document.getElementById('glist-empty');
+  if(empty) empty.style.display=filtered.length?'none':'block';
 }
 
-function renderRow(id, events, max=8){
-  const el = document.getElementById(id);
+function populateGListDepartments(){
+  const el=document.getElementById('glist-dept');
   if(!el) return;
-  if(!events.length){
-    el.innerHTML = `<span style="color:var(--sub);font-size:12px;padding:16px 0">No matches found</span>`;
-    return;
+  const cur=el.value;
+  const depts=[...new Set(glistRows.map(r=>r.Department).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  el.innerHTML='<option value="">All Departments</option>'+
+    depts.map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+  if(depts.includes(cur)) el.value=cur;
+}
+
+function escapeHtml(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============================================================
+// G-LIST — SHAREPOINT SESSION / CONTEXT
+// ============================================================
+
+const SHAREPOINT_SHARING_URL =
+  "https://galaorg-my.sharepoint.com/:l:/g/personal/expiry_tracker_galamarkets_com/JACOPtIpZ4Q_S4knqCy5MPyAAWgodpV_1efQtMxVOKEr1UY?e=KodYDT";
+
+const SHAREPOINT_DEFAULT_SITE =
+  "https://galaorg-my.sharepoint.com/personal/expiry_tracker_galamarkets_com";
+
+const SHAREPOINT_LIST = "StoreBoard";
+
+let sharePointWebUrl = null;
+let sharePointListTitle = SHAREPOINT_LIST;
+let sharePointLastInit = 0;
+let sharePointSessionReady = false;
+
+
+/**
+ * Establish the SharePoint browser session and discover
+ * the actual SharePoint web/list context.
+ *
+ * This is the browser equivalent of the Android app's
+ * initial SharePoint request + CookieJar session setup.
+ */
+async function ensureSharePointContext(forceRefresh = false) {
+
+  const CACHE_TIME = 25 * 60 * 1000;
+
+  // Reuse an already-established context
+  if (
+    !forceRefresh &&
+    sharePointSessionReady &&
+    sharePointWebUrl &&
+    (Date.now() - sharePointLastInit) < CACHE_TIME
+  ) {
+    return {
+      webAbsoluteUrl: sharePointWebUrl,
+      listTitle: sharePointListTitle
+    };
   }
-  el.innerHTML = events.slice(0,max).map(mkMatch).join('');
-}
 
-// ═══════════════════════════════════════════
-// FILTER
-// ═══════════════════════════════════════════
-function filterSport(sport, el){
-  document.querySelectorAll('.sport-ico').forEach(i=>i.classList.remove('on'));
-  el.classList.add('on');
-  curFilter = sport;
-  renderToday(allEvents);
-}
+  console.log('[G-List] Establishing SharePoint session...');
 
-function setChip(sport, el){
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  curFilter = sport;
-  renderToday(allEvents);
-}
-
-// ═══════════════════════════════════════════
-// NAV
-// ═══════════════════════════════════════════
-function navTo(sec, el){
-  document.querySelectorAll('.nt').forEach(b=>b.classList.remove('on'));
-  if(el) el.classList.add('on');
-  document.getElementById('homeS').style.display='none';
-  document.getElementById('gridS').style.display='none';
-  document.getElementById('searchS').style.display='none';
-  document.getElementById('channelS').style.display='none';
-  document.getElementById('si').value='';
-  closeMS();
-  window.scrollTo({top:0,behavior:'smooth'});
-
-  if(sec==='home'){ document.getElementById('homeS').style.display=''; return; }
-  if(sec==='channels'){ document.getElementById('channelS').style.display=''; return; }
-
-  // cricket / football filtered grid
-  document.getElementById('gridS').style.display='';
-  const filtered = allEvents.filter(e=>e.sport===sec);
-  const ico = sec==='cricket'?'🏏':'⚽';
-  document.getElementById('gridTitle').innerHTML=`<div class="st-bar"></div>${ico} ${sec.charAt(0).toUpperCase()+sec.slice(1)} Matches`;
-  document.getElementById('gridCnt').textContent = filtered.length+' matches';
-  document.getElementById('mainGrid').innerHTML = filtered.length
-    ? filtered.map(mkMatch).join('')
-    : `<div class="empty"><span class="empty-ico">${ico}</span>No ${sec} matches right now</div>`;
-}
-
-function goHome(){ navTo('home', document.getElementById('ntHome')); }
-
-// ═══════════════════════════════════════════
-// SEARCH
-// ═══════════════════════════════════════════
-let stimer;
-function doSearch(q){
-  clearTimeout(stimer);
-  const h=document.getElementById('homeS'),g=document.getElementById('gridS'),s=document.getElementById('searchS'),c=document.getElementById('channelS');
-  if(!q.trim()){
-    s.style.display='none';
-    if(document.getElementById('ntHome').classList.contains('on')) h.style.display='';
-    else if(document.getElementById('ntChannels').classList.contains('on')) c.style.display='';
-    else g.style.display='';
-    return;
-  }
-  stimer=setTimeout(()=>{
-    h.style.display='none'; g.style.display='none'; c.style.display='none'; s.style.display='';
-    window.scrollTo({top:0,behavior:'smooth'});
-    const lq=q.toLowerCase();
-    const matchRes = allEvents.filter(e=>(e.event||'').toLowerCase().includes(lq)||(e.category||'').toLowerCase().includes(lq));
-    const chRes = POPULAR_CHANNELS.filter(c=>c.name.toLowerCase().includes(lq));
-    document.getElementById('sCnt').textContent=(matchRes.length+chRes.length)+' results';
-    document.getElementById('searchGrid').innerHTML=[
-      ...matchRes.map(mkMatch),
-      ...chRes.map(mkChannel)
-    ].join('')||`<div class="empty"><span class="empty-ico">🔍</span>No results for "${q}"</div>`;
-  },350);
-}
-
-function toggleMS(){
-  const b=document.getElementById('msb');
-  b.classList.toggle('on');
-  if(b.classList.contains('on')) document.getElementById('msi').focus();
-  else{ document.getElementById('msi').value=''; doSearch(''); }
-}
-function closeMS(){ document.getElementById('msb').classList.remove('on'); document.getElementById('msi').value=''; }
-
-// ═══════════════════════════════════════════
-// PLAYER
-// ═══════════════════════════════════════════
-function playChannel(id, name, title, allChs){
-  curCh={id,name,title:title||name};
-  curFolder=0;
-  document.getElementById('pm').classList.add('on');
-  document.body.style.overflow='hidden';
-  document.getElementById('pmtitle').textContent=(title||name).toUpperCase();
-
-  const chs = allChs||[{channel_id:id,channel_name:name}];
-  const allRows=[];
-  const firstCh = chs[0]||{};
-
-  if(firstCh._hlsUrl || id==='_hls'){
-    // Direct HLS stream from M3U playlist
-    chs.slice(0,6).forEach((ch,i)=>{
-      if(ch._hlsUrl) allRows.push({label:`Stream ${i+1}`,url:ch._hlsUrl});
-    });
-    if(!allRows.length && firstCh._hlsUrl) allRows.push({label:'Stream 1',url:firstCh._hlsUrl});
-    window._srvUrls = allRows.map(r=>r.url);
-    document.getElementById('srvrow').innerHTML=allRows.map((r,i)=>
-      `<div class="srv${i===0?' on':''}" id="srv${i}" onclick="switchSrvIdx(${i},this)">${r.label}</div>`
-    ).join('');
-    loadFrame(allRows[0]?.url||'', name);
-
-  } else if(firstCh._iframeSrc || id==='_embed'){
-    // iframe embed (EmbedSportex style)
-    chs.slice(0,6).forEach((ch,i)=>{
-      if(ch._iframeSrc) allRows.push({label:`Server ${i+1}`,url:ch._iframeSrc});
-    });
-    const firstUrl = (firstCh._iframeSrc)||(chs.find(ch=>ch._iframeSrc)||{})._iframeSrc;
-    window._srvUrls = allRows.map(r=>r.url);
-    document.getElementById('srvrow').innerHTML=allRows.map((r,i)=>
-      `<div class="srv${i===0?' on':''}" id="srv${i}" onclick="switchSrvIdx(${i},this)">${r.label}</div>`
-    ).join('');
-    if(firstUrl) loadFrame(firstUrl, name);
-    else{ document.getElementById('pload').innerHTML='<p style="color:var(--sub)">No stream available</p>'; }
-
-  } else {
-    document.getElementById('pload').innerHTML='<p style="color:var(--sub)">No stream available</p>';
-  }
-}
-
-function switchSrvIdx(idx, el){
-  const url = (window._srvUrls||[])[idx];
-  if(url) switchSrv(idx, url, el);
-}
-
-function switchSrv(idx, url, el){
-  document.querySelectorAll('.srv').forEach(b=>b.classList.remove('on'));
-  if(el) el.classList.add('on');
-  loadFrame(url);
-}
-
-let _hlsInstance = null;
-function loadFrame(url, label){
-  curStreamUrl = url;
-  const loader = document.getElementById('pload');
-  const iframe  = document.getElementById('pif');
-  const video   = document.getElementById('pvid');
-  loader.classList.remove('gone');
-  loader.innerHTML = '<div class="spin"></div><p>Connecting to stream...</p>';
-
-  // Kill previous HLS
-  if(_hlsInstance){ _hlsInstance.destroy(); _hlsInstance = null; }
-
-  const isHls = /\.m3u8|\.ts(\?|$)/.test(url);
-  if(isHls && video){
-    iframe.style.display = 'none'; iframe.src = '';
-    video.style.display = 'block'; video.style.opacity = '0'; video.src = '';
-    if(typeof Hls !== 'undefined' && Hls.isSupported()){
-      _hlsInstance = new Hls({maxBufferLength:30, enableWorker:false, lowLatencyMode:false, xhrSetup:(xhr,url)=>{ xhr.withCredentials=false; }});
-      _hlsInstance.loadSource(url);
-      _hlsInstance.attachMedia(video);
-      _hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=>{
-        video.play().catch(()=>{});
-        loader.classList.add('gone'); video.style.opacity='1';
-      });
-      _hlsInstance.on(Hls.Events.ERROR, (_,d)=>{
-        if(d.fatal) loader.innerHTML='<p style="color:var(--sub)">Stream unavailable — try another source</p>';
-      });
-    } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-      video.src = url;
-      video.onloadedmetadata = ()=>{ video.play().catch(()=>{}); loader.classList.add('gone'); video.style.opacity='1'; };
-      video.onerror = ()=>{ loader.innerHTML='<p style="color:var(--sub)">Failed — try another source</p>'; };
-    } else {
-      loader.innerHTML='<p style="color:var(--sub)">HLS not supported — use external player</p>';
+  const res = await fetch(SHAREPOINT_SHARING_URL, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+    redirect: 'follow',
+    headers: {
+      'Accept': 'text/html,application/xhtml+xml'
     }
-  } else {
-    if(video){ video.style.display='none'; video.src=''; }
-    iframe.style.display = 'block'; iframe.style.opacity = '0'; iframe.src = '';
-    setTimeout(()=>{
-      iframe.onload = ()=>{ loader.classList.add('gone'); iframe.style.opacity='1'; };
-      iframe.onerror = ()=>{ loader.innerHTML='<p style="color:var(--sub)">Failed — try another source</p>'; };
-      iframe.src = url;
-    }, 60);
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to establish SharePoint session (${res.status}).`
+    );
+  }
+
+  const html = await res.text();
+
+  console.log(
+    '[G-List] SharePoint session page received:',
+    res.url
+  );
+
+  // ----------------------------------------------------------
+  // Extract _spPageContextInfo from the returned SharePoint HTML
+  // ----------------------------------------------------------
+
+  let context = null;
+
+  const contextMatch = html.match(
+    /var\s+_spPageContextInfo\s*=\s*(\{[\s\S]*?\});/
+  );
+
+  if (contextMatch) {
+    try {
+      context = JSON.parse(contextMatch[1]);
+    } catch (err) {
+      console.warn(
+        '[G-List] Could not parse _spPageContextInfo JSON.',
+        err
+      );
+    }
+  }
+
+  // ----------------------------------------------------------
+  // Fallback: extract individual values if the object format
+  // is different from expected.
+  // ----------------------------------------------------------
+
+  let webAbsoluteUrl =
+    context?.webAbsoluteUrl ||
+    null;
+
+  let listTitle =
+    context?.listTitle ||
+    SHAREPOINT_LIST;
+
+  if (!webAbsoluteUrl) {
+    const webMatch = html.match(
+      /"webAbsoluteUrl"\s*:\s*"([^"]+)"/
+    );
+
+    if (webMatch) {
+      webAbsoluteUrl = webMatch[1]
+        .replace(/\\\//g, '/')
+        .replace(/\\"/g, '"');
+    }
+  }
+
+  if (!listTitle) {
+    const listMatch = html.match(
+      /"listTitle"\s*:\s*"([^"]+)"/
+    );
+
+    if (listMatch) {
+      listTitle = listMatch[1];
+    }
+  }
+
+  // ----------------------------------------------------------
+  // Use known site/list as fallback
+  // ----------------------------------------------------------
+
+  webAbsoluteUrl =
+    webAbsoluteUrl ||
+    SHAREPOINT_DEFAULT_SITE;
+
+  listTitle =
+    listTitle ||
+    SHAREPOINT_LIST;
+
+  // Remove trailing slash
+  webAbsoluteUrl = webAbsoluteUrl.replace(/\/+$/, '');
+
+  sharePointWebUrl = webAbsoluteUrl;
+  sharePointListTitle = listTitle;
+  sharePointLastInit = Date.now();
+  sharePointSessionReady = true;
+
+  console.log(
+    '[G-List] SharePoint context:',
+    {
+      webAbsoluteUrl: sharePointWebUrl,
+      listTitle: sharePointListTitle
+    }
+  );
+
+  console.log('[G-List] SharePoint session established.');
+
+  return {
+    webAbsoluteUrl: sharePointWebUrl,
+    listTitle: sharePointListTitle
+  };
+}
+
+function sharePointItemsUrl() {
+
+  const site =
+    (sharePointWebUrl || SHAREPOINT_DEFAULT_SITE)
+      .replace(/\/+$/, '');
+
+  const listTitle =
+    sharePointListTitle || SHAREPOINT_LIST;
+
+  const escapedListTitle =
+    listTitle.replace(/'/g, "''");
+
+  const escapedStoreCode =
+    String(storeCode)
+      .trim()
+      .replace(/'/g, "''");
+
+  const listPath =
+    `/_api/web/lists/GetByTitle('${encodeURIComponent(escapedListTitle)}')/items`;
+
+  const select =
+    '$select=Id,StoreCode,Article,Barcode,Description,Department,Status,Created,CreatedOn';
+
+  const filter =
+    `$filter=StoreCode eq '${escapedStoreCode}' and Status eq 'Active'`;
+
+  const order =
+    '$orderby=Created desc';
+
+  return (
+    site +
+    listPath +
+    '?' +
+    select +
+    '&' +
+    filter +
+    '&' +
+    order +
+    '&$top=5000'
+  );
+}
+async function fetchAllSharePointGList() {
+
+  // First establish the same SharePoint session/context
+  // that the Android application establishes.
+  await ensureSharePointContext();
+
+  let url = sharePointItemsUrl();
+
+  const rows = [];
+
+  while (url) {
+
+    console.log(
+      '[G-List] Requesting:',
+      url
+    );
+
+    const res = await fetch(url, {
+      method: 'GET',
+
+      // Important:
+      // browser sends the SharePoint session cookies here.
+      credentials: 'include',
+
+      cache: 'no-store',
+
+      headers: {
+        'Accept': 'application/json;odata=nometadata'
+      }
+    });
+
+    /*
+     * If the session expired, retry the SharePoint
+     * initialization once, just like Android refreshes
+     * its SharePoint context.
+     */
+    if (res.status === 401 || res.status === 403) {
+
+      console.warn(
+        '[G-List] SharePoint session rejected. Reinitializing...'
+      );
+
+      sharePointSessionReady = false;
+      sharePointWebUrl = null;
+      sharePointLastInit = 0;
+
+      await ensureSharePointContext(true);
+
+      const retryUrl = sharePointItemsUrl();
+
+      const retry = await fetch(retryUrl, {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers: {
+          'Accept': 'application/json;odata=nometadata'
+        }
+      });
+
+      if (retry.status === 401 || retry.status === 403) {
+
+        throw new Error(
+          'SharePoint access was denied. ' +
+          'The SharePoint session could not be established ' +
+          'for this browser.'
+        );
+      }
+
+      if (!retry.ok) {
+
+        const text =
+          await retry.text().catch(() => '');
+
+        throw new Error(
+          `SharePoint request failed (${retry.status})` +
+          (text ? `: ${text.slice(0, 180)}` : '')
+        );
+      }
+
+      const retryData = await retry.json();
+
+      const retryValues =
+        Array.isArray(retryData.value)
+          ? retryData.value
+          : [];
+
+      rows.push(...retryValues);
+
+      url =
+        retryData['@odata.nextLink'] ||
+        retryData['odata.nextLink'] ||
+        null;
+
+      continue;
+    }
+
+    if (!res.ok) {
+
+      const text =
+        await res.text().catch(() => '');
+
+      throw new Error(
+        `SharePoint request failed (${res.status})` +
+        (text ? `: ${text.slice(0, 180)}` : '')
+      );
+    }
+
+    const data = await res.json();
+
+    const values =
+      Array.isArray(data.value)
+        ? data.value
+        : [];
+
+    rows.push(...values);
+
+    /*
+     * SharePoint may paginate even when $top=5000.
+     */
+    url =
+      data['@odata.nextLink'] ||
+      data['odata.nextLink'] ||
+      null;
+  }
+
+  /*
+   * SECOND SECURITY/CONSISTENCY CHECK
+   *
+   * Even though SharePoint already filtered:
+   *
+   * StoreCode = logged-in store
+   * Status = Active
+   *
+   * we verify it again before anything reaches AG Grid.
+   */
+  const loggedStore =
+    String(storeCode || '').trim();
+
+  const filteredRows = rows.filter(row => {
+
+    const rowStore =
+      String(row.StoreCode ?? '').trim();
+
+    const status =
+      String(row.Status ?? '').trim();
+
+    return (
+      rowStore === loggedStore &&
+      status.toLowerCase() === 'active'
+    );
+  });
+
+  console.log(
+    `[G-List] SharePoint returned ${rows.length} rows; ` +
+    `${filteredRows.length} rows passed browser validation.`
+  );
+
+  return filteredRows;
+}
+
+async function loadGListData(){
+  const grid=document.getElementById('glist-grid');
+  const refreshBtn=document.getElementById('glist-refresh-btn');
+  if(refreshBtn) refreshBtn.classList.add('glist-refreshing');
+  if(grid) grid.classList.add('glist-refreshing');
+
+  try{
+    if(!storeCode) throw new Error('Store session is not available. Please sign in again.');
+
+    /*
+      Direct SharePoint integration:
+      - No Cloudflare Worker/API call is made here.
+      - SharePoint performs the StoreCode + Active filter server-side.
+      - The browser applies the same filter again before rendering as a second guard.
+      - credentials: include relies on the user's existing Microsoft 365/SharePoint session.
+    */
+    const rows=await fetchAllSharePointGList();
+    glistRows=glistNormalizeRows(rows);
+    populateGListDepartments();
+    buildGListGrid();
+    renderGList();
+
+    const label=document.getElementById('glist-store-label');
+    const refresh=document.getElementById('glist-last-refresh');
+    if(label) label.textContent=storeName+' ('+storeCode+')';
+    if(refresh) refresh.textContent='Updated '+new Date().toLocaleTimeString([],{
+      hour:'2-digit',minute:'2-digit'
+    });
+  }catch(e){
+    glistRows=[];
+    if(glistGridApi) glistGridApi.setGridOption('rowData',[]);
+    updateGListKpis();
+    const empty=document.getElementById('glist-empty');
+    if(empty){
+      empty.style.display='block';
+      empty.innerHTML='<i class="fa-solid fa-triangle-exclamation" style="color:var(--red)"></i>'+
+        '<div style="font-size:14px;font-weight:600;">Unable to Load G-List</div>'+
+        '<div style="font-size:12px;margin-top:4px;">'+escapeHtml(e.message)+'</div>';
+    }
+    toast(e.message||'Unable to load G-List','error');
+  }finally{
+    if(refreshBtn) refreshBtn.classList.remove('glist-refreshing');
+    if(grid) grid.classList.remove('glist-refreshing');
   }
 }
 
-function closePlayer(){
-  document.getElementById('pm').classList.remove('on');
-  const iframe = document.getElementById('pif');
-  const video  = document.getElementById('pvid');
-  iframe.src=''; iframe.style.opacity='0';
-  if(video){ video.src=''; video.style.display='none'; }
-  if(_hlsInstance){ _hlsInstance.destroy(); _hlsInstance=null; }
-  document.getElementById('pload').classList.remove('gone');
-  document.getElementById('pload').innerHTML='<div class="spin"></div><p>Connecting to stream...</p>';
-  document.body.style.overflow='';
-  curStreamUrl='';
+async function refreshGList(){
+  await loadGListData();
 }
 
-function goFS(){
-  const box=document.getElementById('pframe');
-  const req=box.requestFullscreen||box.webkitRequestFullscreen||box.mozRequestFullScreen;
-  if(req) req.call(box).catch(()=>{
-    const f=document.getElementById('pif');
-    const fr=f.requestFullscreen||f.webkitRequestFullscreen;
-    if(fr) fr.call(f).catch(()=>{});
+function exportBarcodesTxt(barcodes,filename){
+  const clean=[...new Set((barcodes||[]).map(v=>String(v||'').trim()).filter(Boolean))];
+  if(!clean.length){
+    toast('No barcodes available to export','error');
+    return;
+  }
+  const blob=new Blob([clean.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename+'_'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function getSelectedGListNodes(){
+  if(!glistGridApi) return [];
+  return glistGridApi.getSelectedNodes().map(n=>n.data).filter(Boolean);
+}
+
+function exportSelectedBarcodes(){
+  const rows=getSelectedGListNodes();
+  if(!rows.length){
+    toast('Select one or more rows first','error');
+    return;
+  }
+  exportBarcodesTxt(rows.map(r=>r.Barcode),storeName+'_GList_Selected_Barcodes');
+}
+
+function exportAllVisibleBarcodes(){
+  if(!glistGridApi){
+    toast('G-List is not loaded','error');
+    return;
+  }
+  const rows=[];
+  glistGridApi.forEachNodeAfterFilterAndSort(n=>rows.push(n.data));
+  exportBarcodesTxt(rows.map(r=>r.Barcode),storeName+'_GList_Visible_Barcodes');
+}
+
+async function copySelectedBarcodes(){
+  const rows=getSelectedGListNodes();
+  if(!rows.length){
+    toast('Select one or more rows first','error');
+    return;
+  }
+  const text=rows.map(r=>String(r.Barcode||'').trim()).filter(Boolean).join('\n');
+  if(!text){
+    toast('Selected rows contain no barcodes','error');
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('Barcodes copied successfully.','success');
+  }catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';
+    ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    toast('Barcodes copied successfully.','success');
+  }
+}
+
+function resetGListFilters(){
+  ['glist-search-barcode','glist-search-description'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const dept=document.getElementById('glist-dept');
+  if(dept) dept.value='';
+  renderGList();
+}
+
+function startGListAutoRefresh(){
+  if(glistRefreshTimer) clearInterval(glistRefreshTimer);
+  glistRefreshTimer=setInterval(()=>{
+    if(document.querySelector('.page.active')?.id==='page-glist') loadGListData();
+  },30000);
+}
+
+function stopGListAutoRefresh(){
+  if(glistRefreshTimer){
+    clearInterval(glistRefreshTimer);
+    glistRefreshTimer=null;
+  }
+}
+
+// ── MANAGE STAFF ──
+function renderStaffPage() {
+  const listEl = document.getElementById('staff-list');
+  if (storeStaffs.length === 0) {
+    listEl.innerHTML = '<div style="color:var(--t3); text-align:center; padding:40px;">No staff added yet. Use the box above to add staff members.</div>';
+    return;
+  }
+  listEl.innerHTML = storeStaffs.map((staff, i) => `
+    <div class="staff-card">
+      <span class="staff-name">${staff}</span>
+      <button class="btn btn-red btn-sm" onclick="removeStaff(${i})"><i class="fa-solid fa-trash"></i> Remove</button>
+    </div>
+  `).join('');
+}
+
+function addStaff() {
+  const input = document.getElementById('staff-input');
+  const name = input.value.trim();
+  if (!name) return toast('Please enter a name', 'error');
+  if (storeStaffs.includes(name)) return toast('Staff member already exists', 'error');
+  
+  storeStaffs.push(name);
+  input.value = '';
+  saveStaffs();
+}
+
+function removeStaff(index) {
+  storeStaffs.splice(index, 1);
+  saveStaffs();
+}
+
+async function saveStaffs() {
+  const staffsStr = storeStaffs.join(',');
+  try {
+    const pass = sessionStorage.getItem('pass') || localStorage.getItem('gala_saved_pass') || '';
+    const res = await fetch(API+'?action=updateStoreStaffs', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        storeCode: storeCode, 
+        password: pass, 
+        staffs: staffsStr 
+      })
+    });
+    const out = await res.json();
+    if (out.success) {
+      toast('Staff list updated', 'success');
+      sessionStorage.setItem('ss', JSON.stringify(storeStaffs));
+      renderStaffPage();
+      populateAllFilters(); // Update dropdowns
+    } else {
+      toast(out.message || 'Failed to update staff', 'error');
+    }
+  } catch (e) {
+    toast('Network error', 'error');
+  }
+}
+
+// ── OVERVIEW ──
+function getDashData(){
+  let d=[...storeData];
+  const ym=gv('dash-ym'), week=gv('dash-week'), dept=gv('dash-dept'), staff=gv('dash-staff');
+  if(ym)   d=d.filter(r=>r.SubMonth===ym);
+  d = filterByWeek(d, week);
+  if(dept) d=d.filter(r=>r.Department===dept);
+  if(staff) d=d.filter(r=>r.StaffName===staff);
+  return d;
+}
+
+function resetDash(){
+  ['dash-ym','dash-week','dash-dept','dash-staff'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderDashboard();
+}
+
+function renderDashboard(){
+  const d=getDashData();
+
+  const F={le7:r=>r.Bucket==='<7 Days',le30:r=>['<7 Days','7–30 Days'].includes(r.Bucket), exp:r=>r.DaysLeft!==null&&r.DaysLeft<=0};
+  const totalStock=d.reduce((s,r)=>{const v=parseFloat(r.Stock);return s+(isNaN(v)||v<=0?0:v);},0);
+  
+  document.getElementById('kpi-dash').innerHTML=
+    KPI('Items',          'neu', d.length)+
+    KPI('Total Stock',    'acc', totalStock)+
+    KPI('Expired Items',  'red', d.filter(F.exp).length, 'Remove from shelf')+
+    KPI('Expiring ≤7 Days','red', d.filter(F.le7).length, 'Immediate action')+
+    KPI('≤30 Days',       'ora', d.filter(F.le30).length);
+
+  // Expired Items Table
+  const expItems = d.filter(r => r.DaysLeft !== null && r.DaysLeft <= 0);
+  document.getElementById('exp-badge').textContent = expItems.length + ' items';
+  document.querySelector('#t-expired tbody').innerHTML = expItems.length === 0 
+    ? '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--t3)">No expired items</td></tr>'
+    : expItems.map(r => {
+        return `<tr>
+          <td class="mono b">${r.Article||'—'}</td>
+          <td class="wrap">${r.Description||'—'}</td>
+          <td class="mono b">${r.Stock||'—'}</td>
+          <td class="mono" style="color:var(--red)">${fmtDate(r.ExpiryDate)}</td>
+        </tr>`;
+      }).join('');
+
+  // Expiring within 7 days Table
+  const exp7Items = d.filter(r => r.DaysLeft !== null && r.DaysLeft > 0 && r.DaysLeft <= 7);
+  document.getElementById('exp7-badge').textContent = exp7Items.length + ' items';
+  document.querySelector('#t-exp7 tbody').innerHTML = exp7Items.length === 0 
+    ? '<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--t3)">No items expiring soon</td></tr>'
+    : exp7Items.map(r => {
+        const dlc = daysColor(r.DaysLeft);
+        return `<tr>
+          <td class="mono b">${r.Article||'—'}</td>
+          <td class="wrap">${r.Description||'—'}</td>
+          <td class="mono b">${r.Stock||'—'}</td>
+          <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+          <td class="mono b" style="color:${dlc}">${r.DaysLeft!==null?r.DaysLeft:'—'}</td>
+        </tr>`;
+      }).join('');
+
+  // Risk bucket chart
+  const buckets=['<7 Days','7–30 Days','31–60 Days','61–90 Days','>90 Days'];
+  const colors=['var(--red)','var(--orange)','var(--yellow)','var(--green)','var(--accent)'];
+  const counts=buckets.map(b=>d.filter(r=>r.Bucket===b).length);
+  const max=Math.max(...counts,1);
+  document.getElementById('dash-chart').innerHTML=buckets.map((b,i)=>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:10.5px;color:var(--t2);width:80px;text-align:right;flex-shrink:0">${b}</div>
+      <div style="flex:1;background:var(--bg);border-radius:3px;height:13px;overflow:hidden;border:1px solid var(--border)">
+        <div style="height:100%;width:${(counts[i]/max*100).toFixed(1)}%;background:${colors[i]};border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;transition:width .6s">
+          <span style="font-size:9.5px;font-family:var(--mono);color:#fff">${counts[i]}</span>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+
+  // Week comparison
+  const weeks=[...new Set(d.map(r=>r.Week).filter(Boolean))].sort();
+  const wkTotals=weeks.map(w=>({week:w,count:d.filter(r=>r.Week===w).length}));
+  document.getElementById('dash-wk-badge').textContent=weeks.length+' weeks';
+  document.getElementById('dash-wk').innerHTML=wkTotals.map((w,i)=>{
+    const prev=wkTotals[i-1];
+    const cls=prev?(w.count>prev.count?'up':w.count<prev.count?'dn':''):''; // Fixed missing empty string
+    const trend=prev?(w.count>prev.count?'↑ Rising':w.count<prev.count?'↓ Falling':'→ Same'):'';
+    return`<div class="wk-cell ${cls}"><div class="wk-cell-label">${w.week}</div><div class="wk-cell-val">${w.count}</div><div class="wk-cell-trend">${trend}</div></div>`;
+  }).join('');
+}
+
+function exportDashXL(){
+  const d=getDashData();
+  if(!d.length){toast('No data to export','error');return;}
+  const rows=d.map(r=>({Week:r.Week,Month:r.SubMonthDisp||r.SubMonth,Article:r.Article,Barcode:r.Barcode,Description:r.Description,Department:r.Department,Staff:r.StaffName,Stock:r.Stock,ExpiryDate:r.ExpiryDate,DaysLeft:r.DaysLeft,RiskBucket:r.Bucket,Timestamp:r.Timestamp}));
+  const tag=[gv('dash-ym'),gv('dash-week'),gv('dash-dept'),gv('dash-staff')].filter(Boolean).join('_')||'All';
+  xlDown(rows, storeName+'_Overview_'+tag);
+}
+
+// ── REVIEW ──
+function renderReview(){
+  const week=gv('rev-week');
+  const ym=gv('rev-ym')||currentYM();
+
+  // Filter locally instead of API call for better performance and exact string match
+  let d=[...storeData];
+  d = filterByWeek(d, week);
+  if(ym) d=d.filter(r=>r.SubMonth===ym);
+  reviewRows=d.map(r=>({...r}));
+  
+  // Apply Department & Staff Filter for Review
+  const dept = gv('rev-dept');
+  const staff = gv('rev-staff');
+  if(dept) reviewRows = reviewRows.filter(r => r.Department === dept);
+  if(staff) reviewRows = reviewRows.filter(r => r.StaffName === staff);
+
+  const F={le7:r=>r.Bucket==='<7 Days',le30:r=>['<7 Days','7–30 Days'].includes(r.Bucket)};
+  document.getElementById('kpi-rev').innerHTML=
+    KPI('Items','neu',reviewRows.length)+
+    KPI('≤7 Days','red',reviewRows.filter(F.le7).length)+
+    KPI('≤30 Days','ora',reviewRows.filter(F.le30).length);
+  document.getElementById('b-rev').textContent=reviewRows.length+' items';
+
+  document.querySelector('#t-rev tbody').innerHTML=reviewRows.length===0
+    ?'<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--t3)">No items found for this period.</td></tr>'
+    :reviewRows.map((r,i)=>{
+      const dlc=daysColor(r.DaysLeft);
+      return`<tr>
+        <td class="mono">${r.Week||'—'}</td>
+        <td>${r.SubMonthDisp||r.SubMonth||ymToDisp(ym)||'—'}</td>
+        <td class="mono b">${r.Article||'—'}</td>
+        <td>${r.Description||'—'}</td>
+        <td>${r.Department||'—'}</td>
+        <td class="mono b">${r.Stock||'—'}</td>
+        <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+        <td class="mono b" style="color:${dlc}">${r.DaysLeft!==null?r.DaysLeft:'—'}</td>
+        <td><span class="badge ${bktCls(r.Bucket)}">${r.Bucket||'—'}</span></td>
+        <td class="mono">${r.StaffName||'—'}</td>
+      </tr>`;
+    }).join('');
+}
+
+function ymToDisp(ym){
+  if(!ym)return'';
+  const m=ym.match(/^(\d{4})-(\d{2})$/);
+  return m?MS[+m[2]-1]+' '+m[1]:ym;
+}
+
+function exportRevXL(){
+  const week=gv('rev-week'),ym=gv('rev-ym'),dept=gv('rev-dept'),staff=gv('rev-staff');
+  let d=[...storeData];
+  d = filterByWeek(d, week);
+  if(ym)  d=d.filter(r=>r.SubMonth===ym);
+  if(dept)d=d.filter(r=>r.Department===dept);
+  if(staff)d=d.filter(r=>r.StaffName===staff);
+  if(!d.length){toast('No data to export','error');return;}
+  const rows=d.map(r=>({Week:r.Week,Month:r.SubMonthDisp||r.SubMonth,Article:r.Article,Barcode:r.Barcode,Description:r.Description,Department:r.Department,Staff:r.StaffName,Stock:r.Stock,ExpiryDate:r.ExpiryDate,DaysLeft:r.DaysLeft,RiskBucket:r.Bucket}));
+  xlDown(rows, storeName+'_Review_'+(week||'AllWeeks')+'_'+(ym||'AllMonths'));
+}
+
+// ── BUYER'S ACTION ──
+function getBuyerActionData(){
+  let d=[...storeData];
+  const ym=gv('ba-ym'), week=gv('ba-week'), dept=gv('ba-dept'), staff=gv('ba-staff');
+  if(ym)   d=d.filter(r=>r.SubMonth===ym);
+  d = filterByWeek(d, week);
+  if(dept) d=d.filter(r=>r.Department===dept);
+  if(staff) d=d.filter(r=>r.StaffName===staff);
+  return d.filter(r => r.ActionTaken && r.ActionTaken.trim() !== '');
+}
+
+function resetBuyerAction() {
+  ['ba-ym', 'ba-week', 'ba-dept', 'ba-staff'].forEach(id => { 
+    const el = document.getElementById(id); 
+    if(el) el.value = ''; 
+  });
+  renderBuyerAction();
+}
+
+function renderBuyerAction(){
+  const d = getBuyerActionData();
+  
+  const transferItems = d.filter(r => r.ActionTaken.includes('Store Transfer'));
+  const rtcItems = d.filter(r => r.ActionTaken.includes('RTC Price Change'));
+  const clearItems = d.filter(r => r.ActionTaken.includes('Clear In Normal Price'));
+  
+  const totalActions = transferItems.length + rtcItems.length + clearItems.length;
+
+  document.getElementById('kpi-ba').innerHTML = 
+    KPI('Total Actioned', 'acc', totalActions) +
+    KPI('Store Transfers', 'neu', transferItems.length) +
+    KPI('RTC Price Changes', 'neu', rtcItems.length) +
+    KPI('Clear In Normal Price', 'neu', clearItems.length);
+
+  // Store Transfer Table
+  const tPanel = document.getElementById('panel-transfer');
+  if(transferItems.length > 0) {
+    tPanel.style.display = 'block';
+    document.getElementById('b-transfer').textContent = transferItems.length + ' items';
+    document.querySelector('#t-transfer tbody').innerHTML = transferItems.map(r => `
+      <tr>
+        <td class="mono">${r.Week||'—'}</td>
+        <td>${r.SubMonthDisp||'—'}</td>
+        <td class="mono b">${r.Article||'—'}</td>
+        <td>${r.Description||'—'}</td>
+        <td>${r.Department||'—'}</td>
+        <td class="mono b">${r.Stock||'—'}</td>
+        <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+        <td>${r.TransferTo ? `<span class="pill pill-transfer">${r.TransferTo}</span>` : '—'}</td>
+        <td class="mono">${r.TransferQty ? `<span class="pill pill-transfer">${r.TransferQty}</span>` : '—'}</td>
+        <td class="mono">${r.StaffName||'—'}</td>
+      </tr>
+    `).join('');
+  } else {
+    tPanel.style.display = 'none';
+  }
+
+  // RTC Price Change Table
+  const rtcPanel = document.getElementById('panel-rtc');
+  if(rtcItems.length > 0) {
+    rtcPanel.style.display = 'block';
+    document.getElementById('b-rtc').textContent = rtcItems.length + ' items';
+    document.querySelector('#t-rtc tbody').innerHTML = rtcItems.map(r => `
+      <tr>
+        <td class="mono">${r.Week||'—'}</td>
+        <td>${r.SubMonthDisp||'—'}</td>
+        <td class="mono b">${r.Article||'—'}</td>
+        <td>${r.Description||'—'}</td>
+        <td>${r.Department||'—'}</td>
+        <td class="mono b">${r.Stock||'—'}</td>
+        <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+        <td class="mono">${r.RtcPrice ? `<span class="pill pill-rtc">AED ${r.RtcPrice}</span>` : '—'}</td>
+        <td class="mono">${r.Start ? fmtDate(r.Start) : '—'}</td>
+        <td class="mono">${r.End ? fmtDate(r.End) : '—'}</td>
+        <td class="mono">${r.StaffName||'—'}</td>
+      </tr>
+    `).join('');
+  } else {
+    rtcPanel.style.display = 'none';
+  }
+
+  // Clear In Normal Price Table
+  const clearPanel = document.getElementById('panel-clear');
+  if(clearItems.length > 0) {
+    clearPanel.style.display = 'block';
+    document.getElementById('b-clear').textContent = clearItems.length + ' items';
+    document.querySelector('#t-clear tbody').innerHTML = clearItems.map(r => `
+      <tr>
+        <td class="mono">${r.Week||'—'}</td>
+        <td>${r.SubMonthDisp||'—'}</td>
+        <td class="mono b">${r.Article||'—'}</td>
+        <td>${r.Description||'—'}</td>
+        <td>${r.Department||'—'}</td>
+        <td class="mono b">${r.Stock||'—'}</td>
+        <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+        <td class="mono">${fmtDate(r.ActionDate) || '—'}</td>
+        <td class="mono">${r.StaffName||'—'}</td>
+      </tr>
+    `).join('');
+  } else {
+    clearPanel.style.display = 'none';
+  }
+
+  // Show empty state if no actions at all
+  document.getElementById('ba-empty').style.display = totalActions === 0 ? 'block' : 'none';
+}
+
+// ── HISTORY ──
+function renderHistory(){
+  const ym=gv('hist-ym'),week=gv('hist-week'),dept=gv('hist-dept'),staff=gv('hist-staff');
+  let d=[...storeData];
+  if(ym)  d=d.filter(r=>r.SubMonth===ym);
+  d = filterByWeek(d, week);
+  if(dept)d=d.filter(r=>r.Department===dept);
+  if(staff)d=d.filter(r=>r.StaffName===staff);
+  
+  const F={le7:r=>r.Bucket==='<7 Days',le30:r=>['<7 Days','7–30 Days'].includes(r.Bucket)};
+  document.getElementById('kpi-hist').innerHTML=
+    KPI('Total Items','neu',d.length)+KPI('≤7 Days','red',d.filter(F.le7).length)+
+    KPI('≤30 Days','ora',d.filter(F.le30).length)+
+    KPI('Months','acc',[...new Set(d.map(r=>r.SubMonth).filter(Boolean))].length)+
+    KPI('Weeks','neu',[...new Set(d.map(r=>r.Week).filter(Boolean))].length);
+
+  const weeks=[...new Set(d.map(r=>r.Week).filter(Boolean))].sort();
+  const wkTotals=weeks.map(w=>({week:w,count:d.filter(r=>r.Week===w).length}));
+  document.getElementById('hist-wk-badge').textContent=weeks.length+' weeks';
+  document.getElementById('hist-wk').innerHTML=wkTotals.map((w,i)=>{
+    const prev=wkTotals[i-1];
+    const cls=prev?(w.count>prev.count?'up':w.count<prev.count?'dn':''):''; // Fixed missing empty string
+    const trend=prev?(w.count>prev.count?'↑ Rising':w.count<prev.count?'↓ Falling':'→ Same'):'';
+    return`<div class="wk-cell ${cls}"><div class="wk-cell-label">${w.week}</div><div class="wk-cell-val">${w.count}</div><div class="wk-cell-trend">${trend}</div></div>`;
+  }).join('');
+
+  document.getElementById('b-hist').textContent=d.length+' items';
+  document.querySelector('#t-hist tbody').innerHTML=d.map(r=>{
+    const dlc=daysColor(r.DaysLeft);
+    return`<tr>
+      <td class="mono" style="font-size:10px">${r.Timestamp||'—'}</td>
+      <td class="mono">${r.Week||'—'}</td>
+      <td>${r.SubMonthDisp||'—'}</td>
+      <td class="mono b">${r.Article||'—'}</td>
+      <td>${r.Description||'—'}</td>
+      <td>${r.Department||'—'}</td>
+      <td class="mono">${r.Stock||'—'}</td>
+      <td class="mono">${fmtDate(r.ExpiryDate)}</td>
+      <td class="mono b" style="color:${dlc}">${r.DaysLeft!==null?r.DaysLeft:'—'}</td>
+      <td><span class="badge ${bktCls(r.Bucket)}">${r.Bucket||'—'}</span></td>
+      <td class="mono">${r.StaffName||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function resetHist(){
+  ['hist-ym','hist-week','hist-dept','hist-staff'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderHistory();
+}
+
+function exportHistXL(){
+  const ym=gv('hist-ym'),week=gv('hist-week'),dept=gv('hist-dept'),staff=gv('hist-staff');
+  let d=[...storeData];
+  if(ym)  d=d.filter(r=>r.SubMonth===ym);
+  d = filterByWeek(d, week);
+  if(dept)d=d.filter(r=>r.Department===dept);
+  if(staff)d=d.filter(r=>r.StaffName===staff);
+  if(!d.length){toast('No data to export','error');return;}
+  const rows=d.map(r=>({Timestamp:r.Timestamp,Week:r.Week,Month:r.SubMonthDisp||r.SubMonth,Article:r.Article,Barcode:r.Barcode,Description:r.Description,Department:r.Department,Staff:r.StaffName,Stock:r.Stock,ExpiryDate:r.ExpiryDate,DaysLeft:r.DaysLeft,RiskBucket:r.Bucket}));
+  const tag=[ym,week,dept,staff].filter(Boolean).join('_')||'All';
+  xlDown(rows, storeName+'_History_'+tag);
+}
+
+// ── SHARED EXCEL HELPER ──
+function xlDown(rows, filename){
+  if(!rows.length) return;
+  const ws = XLSX.utils.json_to_sheet(rows);
+  
+  const cols = Object.keys(rows[0]);
+  const colWidths = cols.map(col => {
+    let maxLen = col.length;
+    rows.forEach(row => {
+      const valLen = String(row[col] || '').length;
+      if (valLen > maxLen) maxLen = valLen;
+    });
+    return { wch: maxLen + 2 };
+  });
+  ws['!cols'] = colWidths;
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  XLSX.writeFile(wb, filename+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+// ── RESIZABLE COLUMNS LOGIC ──
+function makeTableResizable(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const cols = table.querySelectorAll('th');
+  const colElements = table.querySelectorAll('colgroup col');
+
+  const savedWidths = JSON.parse(localStorage.getItem('gala_col_widths_' + tableId) || '[]');
+  if (savedWidths.length === cols.length) {
+    cols.forEach((th, i) => {
+      th.style.width = savedWidths[i];
+      if (colElements[i]) colElements[i].style.width = savedWidths[i];
+    });
+  }
+
+  cols.forEach((th, i) => {
+    const resizer = document.createElement('div');
+    resizer.classList.add('col-resizer');
+    th.appendChild(resizer);
+
+    let startX, startWidth;
+
+    resizer.addEventListener('mousedown', function(e) {
+      startX = e.pageX;
+      startWidth = parseInt(window.getComputedStyle(th).width, 10);
+      document.body.style.cursor = 'col-resize';
+      resizer.classList.add('active');
+      e.preventDefault();
+
+      function onMouseMove(e) {
+        const newWidth = startWidth + (e.pageX - startX);
+        if (newWidth > 30) {
+          th.style.width = newWidth + 'px';
+          if (colElements[i]) colElements[i].style.width = newWidth + 'px';
+        }
+      }
+
+      function onMouseUp() {
+        document.body.style.cursor = '';
+        resizer.classList.remove('active');
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        
+        const widths = Array.from(cols).map(c => c.style.width || 'auto');
+        localStorage.setItem('gala_col_widths_' + tableId, JSON.stringify(widths));
+      }
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
   });
 }
-
-// ═══════════════════════════════════════════
-// EXTERNAL PLAYER
-// ═══════════════════════════════════════════
-function openExt(){
-  if(!curStreamUrl){ toast('Wait for stream to load'); return; }
-  const url=curStreamUrl;
-  const title=encodeURIComponent(curCh&&curCh.title||'Stream');
-
-  const btns=[
-    {ico:'📱',name:'SPlayer',sub:'com.ttee.leeplayer · Recommended',
-     intent:`intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.ttee.leeplayer;S.title=${title};S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.ttee.leeplayer;end`,prim:true},
-    {ico:'🎬',name:'System Chooser',sub:'Android lists all installed video players',
-     intent:`intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.ttee.leeplayer;end`,prim:false},
-    {ico:'🔶',name:'VLC',sub:'org.videolan.vlc',
-     intent:`intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;package=org.videolan.vlc;S.title=${title};S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dorg.videolan.vlc;end`,prim:false},
-    {ico:'⚡',name:'MX Player',sub:'com.mxtech.videoplayer.ad',
-     intent:`intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${title};S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.mxtech.videoplayer.ad;end`,prim:false},
-    {ico:'🔗',name:'Copy URL',sub:'Paste in SPlayer → Open URL',action:'copy',prim:false},
-  ];
-
-  window._ext={btns,url};
-  document.getElementById('epbtns').innerHTML=btns.map((b,i)=>`
-    <button class="epbtn${b.prim?' prim':''}" onclick="doExt(${i})">
-      <span class="ep-ico">${b.ico}</span>
-      <div class="ep-info"><div class="ep-name">${b.name}</div><div class="ep-sub">${b.sub}</div></div>
-    </button>`).join('');
-  document.getElementById('eps').classList.add('on');
-}
-
-function doExt(idx){
-  const {btns,url}=window._ext;
-  const b=btns[idx];
-  if(b.action==='copy'){
-    navigator.clipboard?.writeText(url).then(()=>toast('✓ URL copied')).catch(()=>{
-      const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('✓ URL copied');
-    });
-    closeExt(); return;
-  }
-  if(b.name==='System Chooser'&&navigator.share){
-    navigator.share({title:curCh&&curCh.title||'Stream',url}).catch(()=>{});
-    closeExt(); return;
-  }
-  const a=document.createElement('a'); a.href=b.intent; a.style.display='none';
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>a.remove(),1000);
-  closeExt();
-}
-
-function closeExt(){ document.getElementById('eps').classList.remove('on'); }
-
-// ═══════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════
-let tt;
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),3200);
-}
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ closePlayer(); closeExt(); }
-  if(e.key==='f'&&document.getElementById('pm').classList.contains('on')) goFS();
-});
-
-
-function setSrcBanner(state, msg){
-  const b = document.getElementById('srcBanner');
-  const t = document.getElementById('srcTxt');
-  b.className = state; // ok / warn / err
-  t.textContent = msg;
-}
-
-// Boot
-init();
 </script>
 </body>
 </html>
