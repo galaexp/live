@@ -730,10 +730,8 @@ td.r { text-align:right; }
 <script>
 const API = "https://exp.galamarkets.workers.dev";
 // G-List reads SharePoint directly from the browser. No Cloudflare Worker/API is used for this page.
-// ── SHAREPOINT G-LIST SESSION ──
-// Same SharePoint sharing link used by the Android PDA app.
-// The browser first opens this URL to establish the SharePoint session,
-// then uses the resulting session for the REST API request.
+const SHAREPOINT_SITE = "https://galaorg-my.sharepoint.com/personal/expiry_tracker_galamarkets_com";
+const SHAREPOINT_LIST = "StoreBoard";
 const MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 
@@ -1016,10 +1014,7 @@ function glistNormalizeRows(rows){
     const description=String(r.Description ?? '').trim();
     const department=String(r.Department ?? '').trim();
     const status=String(r.Status ?? '').trim();
-    const created =
-  r.CreatedOn ||
-  r.Created ||
-  '';
+    const created=r.CreatedOn ?? '';
     return {
       _gidx:i,
       _gkey:[store,article,barcode,created].join('|'),
@@ -1158,364 +1153,36 @@ function escapeHtml(v){
   return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// ============================================================
-// G-LIST — SHAREPOINT SESSION / CONTEXT
-// ============================================================
+const GLIST_API = "https://glist.galaexp.workers.dev";
 
-const SHAREPOINT_SHARING_URL =
-  "https://galaorg-my.sharepoint.com/:l:/g/personal/expiry_tracker_galamarkets_com/JACOPtIpZ4Q_S4knqCy5MPyAAWgodpV_1efQtMxVOKEr1UY?e=KodYDT";
+async function fetchAllSharePointGList(){
+  const cleanStore=String(storeCode||'').trim().toUpperCase();
+  if(!cleanStore) throw new Error('Store session is not available. Please sign in again.');
 
-const SHAREPOINT_DEFAULT_SITE =
-  "https://galaorg-my.sharepoint.com/personal/expiry_tracker_galamarkets_com";
-
-const SHAREPOINT_LIST = "StoreBoard";
-
-let sharePointWebUrl = null;
-let sharePointListTitle = SHAREPOINT_LIST;
-let sharePointLastInit = 0;
-let sharePointSessionReady = false;
-
-
-/**
- * Establish the SharePoint browser session and discover
- * the actual SharePoint web/list context.
- *
- * This is the browser equivalent of the Android app's
- * initial SharePoint request + CookieJar session setup.
- */
-async function ensureSharePointContext(forceRefresh = false) {
-
-  const CACHE_TIME = 25 * 60 * 1000;
-
-  // Reuse an already-established context
-  if (
-    !forceRefresh &&
-    sharePointSessionReady &&
-    sharePointWebUrl &&
-    (Date.now() - sharePointLastInit) < CACHE_TIME
-  ) {
-    return {
-      webAbsoluteUrl: sharePointWebUrl,
-      listTitle: sharePointListTitle
-    };
-  }
-
-  console.log('[G-List] Establishing SharePoint session...');
-
-  const res = await fetch(SHAREPOINT_SHARING_URL, {
-    method: 'GET',
-    credentials: 'include',
-    cache: 'no-store',
-    redirect: 'follow',
-    headers: {
-      'Accept': 'text/html,application/xhtml+xml'
-    }
+  const url=GLIST_API+'/glist?storeCode='+encodeURIComponent(cleanStore);
+  const res=await fetch(url,{
+    method:'GET',
+    credentials:'omit',
+    cache:'no-store',
+    headers:{'Accept':'application/json'}
   });
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to establish SharePoint session (${res.status}).`
-    );
+  let data=null;
+  try{ data=await res.json(); }
+  catch(e){ throw new Error(`G-List service returned an invalid response (${res.status}).`); }
+
+  if(!res.ok || !data?.ok){
+    throw new Error(data?.error || `G-List service request failed (${res.status}).`);
   }
 
-  const html = await res.text();
-
-  console.log(
-    '[G-List] SharePoint session page received:',
-    res.url
-  );
-
-  // ----------------------------------------------------------
-  // Extract _spPageContextInfo from the returned SharePoint HTML
-  // ----------------------------------------------------------
-
-  let context = null;
-
-  const contextMatch = html.match(
-    /var\s+_spPageContextInfo\s*=\s*(\{[\s\S]*?\});/
-  );
-
-  if (contextMatch) {
-    try {
-      context = JSON.parse(contextMatch[1]);
-    } catch (err) {
-      console.warn(
-        '[G-List] Could not parse _spPageContextInfo JSON.',
-        err
-      );
-    }
+  // The Worker already applies StoreCode + Status=Active server-side.
+  // Keep a second client-side security guard so another store can never enter the grid.
+  const returnedStore=String(data.storeCode??'').trim().toUpperCase();
+  if(returnedStore && returnedStore!==cleanStore){
+    throw new Error('G-List service returned data for a different store.');
   }
 
-  // ----------------------------------------------------------
-  // Fallback: extract individual values if the object format
-  // is different from expected.
-  // ----------------------------------------------------------
-
-  let webAbsoluteUrl =
-    context?.webAbsoluteUrl ||
-    null;
-
-  let listTitle =
-    context?.listTitle ||
-    SHAREPOINT_LIST;
-
-  if (!webAbsoluteUrl) {
-    const webMatch = html.match(
-      /"webAbsoluteUrl"\s*:\s*"([^"]+)"/
-    );
-
-    if (webMatch) {
-      webAbsoluteUrl = webMatch[1]
-        .replace(/\\\//g, '/')
-        .replace(/\\"/g, '"');
-    }
-  }
-
-  if (!listTitle) {
-    const listMatch = html.match(
-      /"listTitle"\s*:\s*"([^"]+)"/
-    );
-
-    if (listMatch) {
-      listTitle = listMatch[1];
-    }
-  }
-
-  // ----------------------------------------------------------
-  // Use known site/list as fallback
-  // ----------------------------------------------------------
-
-  webAbsoluteUrl =
-    webAbsoluteUrl ||
-    SHAREPOINT_DEFAULT_SITE;
-
-  listTitle =
-    listTitle ||
-    SHAREPOINT_LIST;
-
-  // Remove trailing slash
-  webAbsoluteUrl = webAbsoluteUrl.replace(/\/+$/, '');
-
-  sharePointWebUrl = webAbsoluteUrl;
-  sharePointListTitle = listTitle;
-  sharePointLastInit = Date.now();
-  sharePointSessionReady = true;
-
-  console.log(
-    '[G-List] SharePoint context:',
-    {
-      webAbsoluteUrl: sharePointWebUrl,
-      listTitle: sharePointListTitle
-    }
-  );
-
-  console.log('[G-List] SharePoint session established.');
-
-  return {
-    webAbsoluteUrl: sharePointWebUrl,
-    listTitle: sharePointListTitle
-  };
-}
-
-function sharePointItemsUrl() {
-
-  const site =
-    (sharePointWebUrl || SHAREPOINT_DEFAULT_SITE)
-      .replace(/\/+$/, '');
-
-  const listTitle =
-    sharePointListTitle || SHAREPOINT_LIST;
-
-  const escapedListTitle =
-    listTitle.replace(/'/g, "''");
-
-  const escapedStoreCode =
-    String(storeCode)
-      .trim()
-      .replace(/'/g, "''");
-
-  const listPath =
-    `/_api/web/lists/GetByTitle('${encodeURIComponent(escapedListTitle)}')/items`;
-
-  const select =
-    '$select=Id,StoreCode,Article,Barcode,Description,Department,Status,Created,CreatedOn';
-
-  const filter =
-    `$filter=StoreCode eq '${escapedStoreCode}' and Status eq 'Active'`;
-
-  const order =
-    '$orderby=Created desc';
-
-  return (
-    site +
-    listPath +
-    '?' +
-    select +
-    '&' +
-    filter +
-    '&' +
-    order +
-    '&$top=5000'
-  );
-}
-async function fetchAllSharePointGList() {
-
-  // First establish the same SharePoint session/context
-  // that the Android application establishes.
-  await ensureSharePointContext();
-
-  let url = sharePointItemsUrl();
-
-  const rows = [];
-
-  while (url) {
-
-    console.log(
-      '[G-List] Requesting:',
-      url
-    );
-
-    const res = await fetch(url, {
-      method: 'GET',
-
-      // Important:
-      // browser sends the SharePoint session cookies here.
-      credentials: 'include',
-
-      cache: 'no-store',
-
-      headers: {
-        'Accept': 'application/json;odata=nometadata'
-      }
-    });
-
-    /*
-     * If the session expired, retry the SharePoint
-     * initialization once, just like Android refreshes
-     * its SharePoint context.
-     */
-    if (res.status === 401 || res.status === 403) {
-
-      console.warn(
-        '[G-List] SharePoint session rejected. Reinitializing...'
-      );
-
-      sharePointSessionReady = false;
-      sharePointWebUrl = null;
-      sharePointLastInit = 0;
-
-      await ensureSharePointContext(true);
-
-      const retryUrl = sharePointItemsUrl();
-
-      const retry = await fetch(retryUrl, {
-        method: 'GET',
-        credentials: 'include',
-        cache: 'no-store',
-        headers: {
-          'Accept': 'application/json;odata=nometadata'
-        }
-      });
-
-      if (retry.status === 401 || retry.status === 403) {
-
-        throw new Error(
-          'SharePoint access was denied. ' +
-          'The SharePoint session could not be established ' +
-          'for this browser.'
-        );
-      }
-
-      if (!retry.ok) {
-
-        const text =
-          await retry.text().catch(() => '');
-
-        throw new Error(
-          `SharePoint request failed (${retry.status})` +
-          (text ? `: ${text.slice(0, 180)}` : '')
-        );
-      }
-
-      const retryData = await retry.json();
-
-      const retryValues =
-        Array.isArray(retryData.value)
-          ? retryData.value
-          : [];
-
-      rows.push(...retryValues);
-
-      url =
-        retryData['@odata.nextLink'] ||
-        retryData['odata.nextLink'] ||
-        null;
-
-      continue;
-    }
-
-    if (!res.ok) {
-
-      const text =
-        await res.text().catch(() => '');
-
-      throw new Error(
-        `SharePoint request failed (${res.status})` +
-        (text ? `: ${text.slice(0, 180)}` : '')
-      );
-    }
-
-    const data = await res.json();
-
-    const values =
-      Array.isArray(data.value)
-        ? data.value
-        : [];
-
-    rows.push(...values);
-
-    /*
-     * SharePoint may paginate even when $top=5000.
-     */
-    url =
-      data['@odata.nextLink'] ||
-      data['odata.nextLink'] ||
-      null;
-  }
-
-  /*
-   * SECOND SECURITY/CONSISTENCY CHECK
-   *
-   * Even though SharePoint already filtered:
-   *
-   * StoreCode = logged-in store
-   * Status = Active
-   *
-   * we verify it again before anything reaches AG Grid.
-   */
-  const loggedStore =
-    String(storeCode || '').trim();
-
-  const filteredRows = rows.filter(row => {
-
-    const rowStore =
-      String(row.StoreCode ?? '').trim();
-
-    const status =
-      String(row.Status ?? '').trim();
-
-    return (
-      rowStore === loggedStore &&
-      status.toLowerCase() === 'active'
-    );
-  });
-
-  console.log(
-    `[G-List] SharePoint returned ${rows.length} rows; ` +
-    `${filteredRows.length} rows passed browser validation.`
-  );
-
-  return filteredRows;
+  return Array.isArray(data.rows)?data.rows:[];
 }
 
 async function loadGListData(){
@@ -1528,11 +1195,13 @@ async function loadGListData(){
     if(!storeCode) throw new Error('Store session is not available. Please sign in again.');
 
     /*
-      Direct SharePoint integration:
-      - No Cloudflare Worker/API call is made here.
-      - SharePoint performs the StoreCode + Active filter server-side.
-      - The browser applies the same filter again before rendering as a second guard.
-      - credentials: include relies on the user's existing Microsoft 365/SharePoint session.
+      G-List data path:
+      Dashboard -> glist.galaexp.workers.dev -> SharePoint StoreBoard
+
+      The dashboard does NOT call SharePoint directly and does NOT use the
+      existing expiry API. The G-List Worker establishes the SharePoint
+      sharing-link session, carries its cookies through redirects, reads
+      StoreBoard, and returns only StoreCode + Active rows.
     */
     const rows=await fetchAllSharePointGList();
     glistRows=glistNormalizeRows(rows);
